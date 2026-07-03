@@ -1,0 +1,1363 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>장비제조 ERP 테스트 v2.0</title>
+<style>
+:root{--bg:#f4f6f9;--card:#fff;--line:#e2e8f0;--txt:#1e293b;--sub:#64748b;--pri:#2563eb;--pri2:#1d4ed8;--ok:#16a34a;--warn:#d97706;--bad:#dc2626;--nav:#0f172a;}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Malgun Gothic','Apple SD Gothic Neo',sans-serif;background:var(--bg);color:var(--txt);font-size:13px;display:flex;min-height:100vh}
+aside{width:200px;background:var(--nav);color:#cbd5e1;flex-shrink:0;position:sticky;top:0;height:100vh;overflow-y:auto}
+aside h1{font-size:15px;color:#fff;padding:16px 14px 10px;border-bottom:1px solid #1e293b}
+aside h1 small{display:block;font-size:10px;color:#64748b;font-weight:normal;margin-top:3px}
+aside a{display:block;padding:10px 16px;color:#cbd5e1;text-decoration:none;font-size:13px;border-left:3px solid transparent}
+aside a:hover{background:#1e293b}
+aside a.on{background:#1e293b;color:#fff;border-left-color:var(--pri);font-weight:bold}
+aside .foot{padding:12px 14px;font-size:11px;color:#475569;border-top:1px solid #1e293b;margin-top:12px}
+aside .foot button{width:100%;margin-top:6px}
+main{flex:1;padding:18px 22px;max-width:1200px}
+h2{font-size:18px;margin-bottom:4px}
+h3{font-size:14px;margin:14px 0 8px}
+.crumb{font-size:12px;color:var(--sub);margin-bottom:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:14px;margin-bottom:14px}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px;margin-bottom:14px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:12px;cursor:pointer}
+.stat:hover{border-color:var(--pri);box-shadow:0 1px 4px rgba(37,99,235,.15)}
+.stat .t{font-size:12px;color:var(--sub)}
+.stat .v{font-size:19px;font-weight:bold;margin-top:4px}
+.stat .s{font-size:11px;color:var(--sub);margin-top:2px}
+table{width:100%;border-collapse:collapse;background:var(--card)}
+th{background:#f8fafc;font-size:12px;color:var(--sub);text-align:left;padding:7px 8px;border-bottom:2px solid var(--line);white-space:nowrap}
+td{padding:6px 8px;border-bottom:1px solid var(--line);vertical-align:middle}
+tr:hover td{background:#f8fafc}
+td.r,th.r{text-align:right}
+td.c,th.c{text-align:center}
+.num{font-variant-numeric:tabular-nums}
+a.lnk{color:var(--pri);cursor:pointer;text-decoration:none}
+a.lnk:hover{text-decoration:underline}
+.badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;white-space:nowrap;cursor:default}
+.b-gray{background:#f1f5f9;color:#475569}.b-blue{background:#dbeafe;color:#1d4ed8}.b-green{background:#dcfce7;color:#15803d}.b-amber{background:#fef3c7;color:#b45309}.b-red{background:#fee2e2;color:#b91c1c}.b-purple{background:#f3e8ff;color:#7e22ce}
+button{font-family:inherit;font-size:12px;padding:6px 12px;border:1px solid var(--line);background:#fff;border-radius:6px;cursor:pointer;color:var(--txt)}
+button:hover{background:#f1f5f9}
+button.pri{background:var(--pri);border-color:var(--pri);color:#fff}
+button.pri:hover{background:var(--pri2)}
+button.danger{color:var(--bad);border-color:#fecaca}
+button.sm{padding:3px 8px;font-size:11px}
+button:disabled{opacity:.45;cursor:not-allowed}
+input,select,textarea{font-family:inherit;font-size:13px;padding:6px 8px;border:1px solid var(--line);border-radius:6px;background:#fff;color:var(--txt)}
+input:focus,select:focus,textarea:focus{outline:2px solid #bfdbfe;border-color:var(--pri)}
+input.r{text-align:right}
+input:disabled,select:disabled{background:#f1f5f9;color:var(--sub)}
+.frm{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.frm label{display:block;font-size:11px;color:var(--sub);margin-bottom:3px}
+.frm .full{grid-column:1/-1}
+.frm input,.frm select,.frm textarea{width:100%}
+.bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
+.bar .sp{flex:1}
+.tabs{display:flex;gap:2px;border-bottom:2px solid var(--line);margin-bottom:12px}
+.tabs a{padding:8px 16px;font-size:13px;color:var(--sub);text-decoration:none;border-bottom:2px solid transparent;margin-bottom:-2px;cursor:pointer}
+.tabs a.on{color:var(--pri);border-bottom-color:var(--pri);font-weight:bold}
+.linkpanel{background:#f8fafc;border:1px dashed #cbd5e1;border-radius:8px;padding:10px 12px;font-size:12px;margin-top:10px}
+.linkpanel b{color:var(--sub);font-size:11px;display:block;margin-bottom:5px}
+.linkpanel .row{margin:3px 0}
+.warnbox{background:#fffbeb;border:1px solid #fde68a;border-radius:6px;padding:8px 10px;font-size:12px;color:#92400e;margin:8px 0}
+.okbox{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:6px;padding:8px 10px;font-size:12px;color:#166534;margin:8px 0}
+#modal-bg{position:fixed;inset:0;background:rgba(15,23,42,.45);display:none;z-index:50}
+#modal{position:fixed;top:6vh;left:50%;transform:translateX(-50%);width:min(760px,94vw);max-height:86vh;overflow-y:auto;background:#fff;border-radius:10px;padding:18px;display:none;z-index:51;box-shadow:0 10px 40px rgba(0,0,0,.25)}
+#modal h3{margin-top:0}
+.mini{font-size:11px;color:var(--sub)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:900px){.grid2{grid-template-columns:1fr}}
+.gaugewrap{background:#e2e8f0;border-radius:6px;height:14px;position:relative;overflow:hidden}
+.gauge{height:100%;border-radius:6px}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#0f172a;color:#fff;padding:10px 18px;border-radius:8px;font-size:13px;z-index:99;opacity:0;transition:opacity .3s}
+.kbd{background:#f1f5f9;border:1px solid var(--line);border-radius:4px;padding:1px 5px;font-size:11px}
+</style>
+</head>
+<body>
+<aside>
+  <h1>장비제조 ERP <small>테스트 v2.0 · 수주생산형 · 결재/이메일/자재</small></h1>
+  <div style="padding:10px 14px;border-bottom:1px solid #1e293b"><label style="font-size:10px;color:#64748b;display:block;margin-bottom:3px">현재 사용자 (테스트용 전환)</label><select id="user-sel" style="width:100%;background:#1e293b;color:#e2e8f0;border-color:#334155" onchange="switchUser(this.value)"></select></div>
+  <nav id="nav"></nav>
+  <div class="foot">
+    데이터는 이 브라우저에 저장됩니다.
+    <button class="sm" onclick="exportJson()">백업(JSON)</button>
+    <button class="sm" onclick="resetSeed()">샘플로 초기화</button>
+    <button class="sm danger" onclick="wipeAll()">전체 삭제</button>
+  </div>
+</aside>
+<main id="main"></main>
+<div id="modal-bg" onclick="closeModal()"></div>
+<div id="modal"></div>
+<div id="toast" class="toast"></div>
+<script>
+'use strict';
+/* ================= 데이터 계층 ================= */
+const LS_KEY='erp_test_v2';
+let DB=null;
+function saveDB(){localStorage.setItem(LS_KEY,JSON.stringify(DB));}
+function loadDB(){try{DB=JSON.parse(localStorage.getItem(LS_KEY));}catch(e){DB=null;}
+  if(!DB||!DB.companies){DB=seedData();saveDB();}
+  else{ // v1 데이터 마이그레이션
+    DB.users=DB.users||[{id:'u1',name:'김재성 (대표)',role:'approver'},{id:'u2',name:'박담당 (영업/구매)',role:'staff'}];
+    DB.settings=DB.settings||{currentUserId:'u1',approvalLimit:1000000,quoteApproval:true};
+    DB.issues=DB.issues||[];DB.emailLog=DB.emailLog||[];saveDB();}}
+let _uidc=0;
+function uid(p){_uidc++;return p+Date.now().toString(36)+(_uidc%1000).toString(36)+Math.random().toString(36).slice(2,5);}
+function docNo(pfx,dateStr){const y=(dateStr||today()).slice(0,4);const k=pfx+y;DB.seq=DB.seq||{};DB.seq[k]=(DB.seq[k]||0)+1;return pfx+y+'-'+String(DB.seq[k]).padStart(4,'0');}
+function today(){return new Date().toISOString().slice(0,10);}
+function addDays(d,n){const t=new Date(d);t.setDate(t.getDate()+n);return t.toISOString().slice(0,10);}
+function fmt(n){return (n==null||isNaN(n))?'0':Math.round(n).toLocaleString('ko-KR');}
+function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.style.opacity=1;clearTimeout(t._h);t._h=setTimeout(()=>t.style.opacity=0,2200);}
+function byId(arr,id){return arr.find(x=>x.id===id);}
+function co(id){return byId(DB.companies,id)||{name:'(삭제됨)'};}
+function touch(o){o.updatedAt=new Date().toISOString();}
+
+/* ---- 계산 헬퍼 (미수금은 저장하지 않고 항상 계산) ---- */
+function lineTotals(lines){let s=0,v=0;(lines||[]).forEach(l=>{s+=l.supply||0;v+=l.vat||0;});return{supply:s,vat:v,total:s+v};}
+function calcLine(l,taxExempt){l.qty=+l.qty||0;l.price=Math.round(+l.price||0);l.supply=Math.round(l.qty*l.price);l.vat=taxExempt?0:Math.round(l.supply*0.1);return l;}
+function instAlloc(instId){return DB.allocs.filter(a=>a.targetType==='installment'&&a.targetId===instId).reduce((s,a)=>s+a.amount,0);}
+function instRemain(inst){return inst.amount-instAlloc(inst.id);}
+function ptransAlloc(tid){return DB.allocs.filter(a=>a.targetType==='purchaseTrans'&&a.targetId===tid).reduce((s,a)=>s+a.amount,0);}
+function bankAllocated(bid){return DB.allocs.filter(a=>a.bankId===bid).reduce((s,a)=>s+a.amount+(a.fee||0),0);}
+function bankRemain(b){return Math.abs(b.amount)-bankAllocated(b.id);}
+function orderInsts(oid){return DB.installments.filter(i=>i.orderId===oid).sort((a,b)=>a.seq-b.seq);}
+function orderTotal(o){return lineTotals(o.lines).total;}
+function orderReceivable(o){const ins=orderInsts(o.id);return ins.reduce((s,i)=>s+i.amount,0)-ins.reduce((s,i)=>s+instAlloc(i.id),0);}
+function totalReceivable(){return DB.orders.filter(o=>o.status!=='canceled').reduce((s,o)=>s+orderReceivable(o),0);}
+function refreshInstStatus(inst){const paid=instAlloc(inst.id);
+  if(paid>=inst.amount&&inst.amount>0){inst.status='paid';}
+  else if(inst.status==='paid'){inst.status=inst.tiId?'billed':'planned';}}
+function deliveredQty(orderId){ // itemKey -> 누적 납품수량
+  const m={};DB.trans.filter(t=>t.type==='sales'&&t.orderId===orderId).forEach(t=>t.lines.forEach(l=>{const k=(l.itemId||'')+'|'+l.name;m[k]=(m[k]||0)+l.qty;}));return m;}
+function receivedQty(poId){const m={};DB.trans.filter(t=>t.type==='purchase'&&t.poId===poId).forEach(t=>t.lines.forEach(l=>{const k=(l.itemId||'')+'|'+l.name;m[k]=(m[k]||0)+l.qty;}));return m;}
+function orderDirectCost(oid){ // 수주 직납 발주의 입고 실적 (buy-to-job)
+  return DB.trans.filter(t=>t.type==='purchase'&&DB.pos.some(p=>p.id===t.poId&&p.orderId===oid)).reduce((s,t)=>s+lineTotals(t.lines).supply,0);}
+function orderMaterialCost(oid){ // 직납 + 공용재고 불출
+  return orderDirectCost(oid)+((DB.issues||[]).filter(i=>i.orderId===oid).reduce((s,i)=>s+i.qty*i.unitCost,0));}
+function transInvoiced(tid){return DB.taxInvoices.some(ti=>ti.basis==='trans'&&ti.basisId===tid&&ti.status!=='void');}
+function monthRange(ym){return [ym+'-01',ym+'-31'];}
+function thisMonth(){return today().slice(0,7);}
+
+/* ---- 상태 배지 ---- */
+const ST={quote:{draft:['작성중','b-gray'],sent:['발송','b-blue'],converted:['수주됨','b-green'],lost:['실주','b-red']},
+order:{ordered:['수주','b-blue'],producing:['제작중','b-amber'],delivered:['납품완료','b-green'],closed:['종결','b-gray'],canceled:['취소','b-red']},
+inst:{planned:['예정','b-gray'],billed:['청구','b-amber'],paid:['수금완료','b-green']},
+trans:{open:['작성','b-blue'],invoiced:['계산서발행','b-green']},
+po:{ordered:['발주','b-blue'],received:['입고완료','b-green'],closed:['종결','b-gray']},
+ti:{draft:['임시','b-gray'],sent:['발행','b-green'],void:['취소분','b-red']},
+bank:{unmatched:['미대사','b-amber'],matched:['대사완료','b-green'],partial:['부분대사','b-blue'],etc:['기타처리','b-gray']}};
+function badge(kind,st){const d=(ST[kind]||{})[st]||[st,'b-gray'];return '<span class="badge '+d[1]+'">'+d[0]+'</span>';}
+function bankStatus(b){const al=bankAllocated(b.id);if(b.status==='etc')return 'etc';if(al<=0)return 'unmatched';return bankRemain(b)>0?'partial':'matched';}
+
+/* ---- v2: 사용자 / 결재 ---- */
+function curUser(){return byId(DB.users||[],(DB.settings||{}).currentUserId)||{id:'u?',name:'사용자',role:'approver'};}
+function isApprover(){return curUser().role==='approver';}
+function switchUser(id){DB.settings.currentUserId=id;saveDB();route();toast(curUser().name+' 으로 전환');}
+function userName(id){return (byId(DB.users||[],id)||{name:id==='system'?'자동':id}).name;}
+function apvOf(d){return d.apv||{status:'none'};}
+function apvDoc(type,id){return type==='quote'?byId(DB.quotes,id):byId(DB.pos,id);}
+function apvBadge(d){const a=apvOf(d);
+  return a.status==='approved'?'<span class="badge b-green" title="'+(a.auto?'한도 이하 자동승인':'승인: '+userName(a.decBy||'')+' '+(a.decAt||''))+'">'+(a.auto?'자동승인':'승인')+'</span>'
+  :a.status==='pending'?'<span class="badge b-purple" title="상신: '+userName(a.reqBy||'')+'">결재중</span>'
+  :a.status==='rejected'?'<span class="badge b-red" title="'+esc(a.note||'')+'">반려</span>'
+  :'<span class="badge b-gray">미상신</span>';}
+function quoteApvOk(q){return !DB.settings.quoteApproval||apvOf(q).status==='approved';}
+function poApvOk(p){return apvOf(p).status==='approved';}
+function submitApv(type,id){const d=apvDoc(type,id);
+  d.apv={status:'pending',reqBy:curUser().id,reqAt:today(),decBy:null,decAt:null,note:'',auto:false};
+  saveDB();route();toast('결재 상신되었습니다 — 결재함에서 승인 대기');}
+function decideApv(type,id,ok){
+  if(!isApprover()){toast('승인 권한이 없습니다 (사용자 전환으로 대표 계정 선택)');return;}
+  const d=apvDoc(type,id);let note='';
+  if(!ok){note=prompt('반려 의견을 입력하세요','금액 확인 필요');if(note===null)return;}
+  d.apv=Object.assign({},d.apv,{status:ok?'approved':'rejected',decBy:curUser().id,decAt:today(),note,auto:false});
+  saveDB();route();toast(ok?'승인되었습니다':'반려되었습니다');}
+function autoApvPo(p){const sup=lineTotals(p.lines).supply;
+  if(sup<=(DB.settings.approvalLimit||0)){p.apv={status:'approved',auto:true,decBy:'system',decAt:today(),reqBy:curUser().id,note:''};return true;}
+  return false;}
+function resetApvIfNeeded(d){const a=apvOf(d);
+  if(a.status==='approved'||a.status==='pending'){d.apv={status:'none'};return true;}return false;}
+function pendingApvList(){const out=[];
+  DB.quotes.forEach(q=>{if(apvOf(q).status==='pending')out.push({type:'quote',d:q});});
+  DB.pos.forEach(p=>{if(apvOf(p).status==='pending')out.push({type:'po',d:p});});
+  return out;}
+
+/* ---- v2: 자재 재고 (공통 입고 − 사용처리) ---- */
+function isCommonPo(poId){const p=byId(DB.pos,poId);return p&&!p.orderId;}
+function stockRows(){const m={};
+  DB.trans.filter(t=>t.type==='purchase'&&isCommonPo(t.poId)).forEach(t=>t.lines.forEach(l=>{
+    const k=l.itemId||('n:'+l.name);
+    if(!m[k])m[k]={key:k,itemId:l.itemId,name:l.name,spec:l.spec,unit:l.unit,inQty:0,inAmt:0};
+    m[k].inQty+=l.qty;m[k].inAmt+=l.supply;}));
+  (DB.issues||[]).forEach(is=>{const k=is.itemId||('n:'+is.name);
+    if(!m[k])m[k]={key:k,itemId:is.itemId,name:is.name,spec:'',unit:'',inQty:0,inAmt:0};
+    m[k].outQty=(m[k].outQty||0)+is.qty;});
+  return Object.values(m).map(r=>{r.outQty=r.outQty||0;r.qty=r.inQty-r.outQty;
+    r.avgCost=r.inQty>0?Math.round(r.inAmt/r.inQty):((byId(DB.items,r.itemId)||{}).buyPrice||0);return r;});}
+function stockOf(key){return stockRows().find(r=>r.key===key)||{qty:0,avgCost:0};}
+function orderIssueCost(oid){return (DB.issues||[]).filter(i=>i.orderId===oid).reduce((s,i)=>s+i.qty*i.unitCost,0);}
+
+/* ---- v2: 이메일 (무료 구간: mailto + 발송기록 / SMTP는 자리만) ---- */
+function docEmailInfo(docType,id){
+  if(docType==='quote'){const q=byId(DB.quotes,id);const t=lineTotals(q.lines);
+    return {doc:q,no:q.no,co:co(q.companyId),title:'견적서',
+      body:'안녕하세요, '+co(q.companyId).name+' 담당자님.\n\n견적서를 송부드립니다.\n\n[견적서 '+q.no+']\n견적일: '+q.date+' / 유효기간: '+(q.validUntil||'-')+'\n'+q.lines.map(l=>'- '+l.name+(l.spec?' ('+l.spec+')':'')+' x'+l.qty+' = '+fmt(l.supply+l.vat)+'원').join('\n')+'\n합계(VAT포함): '+fmt(t.total)+'원\n\n검토 부탁드립니다.\n감사합니다.'};}
+  if(docType==='po'){const p=byId(DB.pos,id);const t=lineTotals(p.lines);
+    return {doc:p,no:p.no,co:co(p.companyId),title:'발주서',
+      body:'안녕하세요, '+co(p.companyId).name+' 담당자님.\n\n아래와 같이 발주드립니다.\n\n[발주서 '+p.no+']\n발주일: '+p.date+' / 입고요청일: '+(p.dueDate||'-')+'\n'+p.lines.map(l=>'- '+l.name+(l.spec?' ('+l.spec+')':'')+' x'+l.qty+' @'+fmt(l.price)+' = '+fmt(l.supply)+'원').join('\n')+'\n합계(공급가): '+fmt(t.supply)+'원\n\n납기 회신 부탁드립니다.\n감사합니다.'};}
+  const d=byId(DB.trans,id);const t=lineTotals(d.lines);
+  return {doc:d,no:d.no,co:co(d.companyId),title:'거래명세서',
+    body:'안녕하세요.\n\n거래명세서를 송부드립니다.\n\n[거래명세서 '+d.no+']\n납품일: '+d.date+'\n'+d.lines.map(l=>'- '+l.name+' x'+l.qty+' = '+fmt(l.supply+l.vat)+'원').join('\n')+'\n합계(VAT포함): '+fmt(t.total)+'원\n\n감사합니다.'};}
+function emailModal(docType,id){
+  if(docType==='quote'&&!quoteApvOk(byId(DB.quotes,id))){toast('⚠ 결재 승인 후 발송할 수 있습니다 (견적 결재 필수 설정)');return;}
+  if(docType==='po'&&!poApvOk(byId(DB.pos,id))){toast('⚠ 결재 승인 후 발송할 수 있습니다');return;}
+  const info=docEmailInfo(docType,id);
+  const logs=(DB.emailLog||[]).filter(e=>e.docType===docType&&e.docId===id);
+  openModal('<h3>이메일 발송 — '+info.title+' '+info.no+'</h3>'
+  +'<div class="frm" style="margin:10px 0">'
+  +'<div class="full"><label>받는 사람</label><input id="em-to" value="'+esc(info.co.email||'')+'" placeholder="거래처에 이메일이 없습니다 — 직접 입력"></div>'
+  +'<div class="full"><label>제목</label><input id="em-subj" value="'+esc('['+info.title+'] '+info.no+' — '+info.co.name+' 귀중')+'"></div>'
+  +'<div class="full"><label>본문 (자동 생성 — 수정 가능)</label><textarea id="em-body" rows="9" style="width:100%">'+esc(info.body)+'</textarea></div></div>'
+  +'<div class="bar"><button class="pri" onclick="emailSend(\''+docType+'\',\''+id+'\',true)">메일 앱 열어 보내기</button>'
+  +'<button onclick="emailSend(\''+docType+'\',\''+id+'\',false)">발송 기록만 저장</button><button onclick="closeModal()">취소</button></div>'
+  +'<div class="mini" style="margin-top:6px">무료 구간: 기본 메일 앱(mailto) 호출 + 기록 저장. PDF 첨부·자동발송·열람추적은 SMTP 연동(추후, 서버 필요) 자리입니다.</div>'
+  +(logs.length?'<div class="linkpanel"><b>이 문서의 발송 이력</b>'+logs.map(e=>'<div class="row">'+e.date+' · '+esc(e.to)+' · '+esc(e.subject)+' <span class="mini">('+userName(e.by)+', '+e.method+')</span></div>').join('')+'</div>':''));}
+function emailSend(docType,id,openMail){
+  const to=document.getElementById('em-to').value.trim();
+  const subj=document.getElementById('em-subj').value;
+  const body=document.getElementById('em-body').value;
+  if(!to){toast('받는 사람 이메일을 입력하세요');return;}
+  DB.emailLog=DB.emailLog||[];
+  DB.emailLog.push({id:uid('em'),date:today(),docType,docId:id,to,subject:subj,body,method:'mailto',by:curUser().id});
+  saveDB();closeModal();route();
+  if(openMail){location.href='mailto:'+to+'?subject='+encodeURIComponent(subj)+'&body='+encodeURIComponent(body);}
+  toast(openMail?'메일 앱을 열었습니다 · 발송 기록 저장됨':'발송 기록이 저장되었습니다');}
+
+/* ================= 라우터 ================= */
+const NAVS=[['#/dash','홈 (대시보드)'],['#/approvals','결재함'],['#/companies','거래처'],['#/items','품목'],['#/sales','영업 (매출)'],['#/purchase','구매 (매입)'],['#/money','자금 / 통장대사'],['#/reports','조회 / 장부']];
+function renderNav(){const h=location.hash||'#/dash';
+  const pend=pendingApvList().length;
+  document.getElementById('nav').innerHTML=NAVS.map(n=>{
+  const on=h.startsWith(n[0])||(n[0]==='#/sales'&&/#\/(quote|order|delivery|invoice)/.test(h))||(n[0]==='#/purchase'&&(h.startsWith('#/po')||h.startsWith('#/stock')||h.startsWith('#/ptrans')||h.startsWith('#/pinvoice')))?' class="on"':'';
+  const extra=n[0]==='#/approvals'&&pend?' <span class="badge b-red">'+pend+'</span>':'';
+  return '<a href="'+n[0]+'"'+on+'>'+n[1]+extra+'</a>';}).join('');
+  const us=document.getElementById('user-sel');
+  if(us)us.innerHTML=(DB.users||[]).map(u=>'<option value="'+u.id+'"'+(u.id===curUser().id?' selected':'')+'>'+esc(u.name)+(u.role==='approver'?' ★승인권한':'')+'</option>').join('');}
+function route(){renderNav();const h=(location.hash||'#/dash').slice(2);const[p,sub,id]=h.split('/');
+  closeModal();const M=document.getElementById('main');
+  try{
+  switch(p){
+    case 'dash':pageDash(M);break;
+    case 'companies':sub==='edit'?pageCompanyEdit(M,id):pageCompanies(M);break;
+    case 'items':sub==='edit'?pageItemEdit(M,id):pageItems(M);break;
+    case 'sales':pageSales(M,'quotes');break;
+    case 'quotes':sub==='edit'?pageQuoteEdit(M,id):pageSales(M,'quotes');break;
+    case 'orders':sub==='view'?pageOrderView(M,id):sub==='edit'?pageOrderEdit(M,id):pageSales(M,'orders');break;
+    case 'deliveries':pageSales(M,'deliveries');break;
+    case 'invoices':pageSales(M,'invoices');break;
+    case 'purchase':pagePurchase(M,'pos');break;
+    case 'po':sub==='edit'?pagePoEdit(M,id):sub==='view'?pagePoView(M,id):pagePurchase(M,'pos');break;
+    case 'ptrans':pagePurchase(M,'ptrans');break;
+    case 'pinvoices':pagePurchase(M,'pinvoices');break;
+    case 'stock':pagePurchase(M,'stock');break;
+    case 'approvals':pageApprovals(M);break;
+    case 'money':pageMoney(M,sub||'status');break;
+    case 'reports':pageReports(M,sub||'ledger');break;
+    default:pageDash(M);
+  }}catch(e){M.innerHTML='<div class="card">오류: '+esc(e.message)+'</div>';console.error(e);}
+  window.scrollTo(0,0);}
+window.addEventListener('hashchange',route);
+
+/* ================= 모달 ================= */
+function openModal(html){document.getElementById('modal').innerHTML=html;document.getElementById('modal').style.display='block';document.getElementById('modal-bg').style.display='block';}
+function closeModal(){document.getElementById('modal').style.display='none';document.getElementById('modal-bg').style.display='none';}
+
+/* ================= 관리 기능 ================= */
+function exportJson(){const a=document.createElement('a');a.href='data:application/json;charset=utf-8,'+encodeURIComponent(JSON.stringify(DB,null,1));a.download='erp_backup_'+today()+'.json';a.click();}
+function resetSeed(){if(confirm('현재 데이터를 지우고 샘플 데이터로 초기화할까요?')){DB=seedData();saveDB();route();toast('샘플 데이터로 초기화했습니다');}}
+function wipeAll(){if(confirm('모든 데이터를 삭제할까요? (빈 상태로 시작)')){DB=seedData(true);saveDB();route();toast('전체 삭제 완료');}}
+
+/* ================= 샘플 데이터 ================= */
+function seedData(empty){
+  const base={seq:{},companies:[],items:[],quotes:[],orders:[],installments:[],trans:[],pos:[],taxInvoices:[],bank:[],allocs:[],
+    users:[{id:'u1',name:'김재성 (대표)',role:'approver'},{id:'u2',name:'박담당 (영업/구매)',role:'staff'}],
+    settings:{currentUserId:'u1',approvalLimit:1000000,quoteApproval:true},
+    issues:[],emailLog:[]};
+  if(empty)return base;
+  const APV_OK={status:'approved',auto:false,reqBy:'u2',reqAt:'2026-05-01',decBy:'u1',decAt:'2026-05-01',note:''};
+  const APV_AUTO={status:'approved',auto:true,reqBy:'u2',decBy:'system',decAt:'2026-06-18',note:''};
+  const L=(itemId,name,spec,unit,qty,price,exempt)=>calcLine({itemId,name,spec,unit,qty,price},!!exempt);
+  base.companies=[
+    {id:'c1',name:'(주)대한정밀',bizno:'123-81-45678',ceo:'박정호',addr:'경기 화성시 동탄산단로 12',tel:'031-123-4567',email:'order@dhprec.co.kr',type:'sales',memo:'',aliases:['대한정밀'],active:1},
+    {id:'c2',name:'스마트팩토리(주)',bizno:'220-88-11223',ceo:'이수민',addr:'충남 아산시 탕정면 산업로 88',tel:'041-555-2211',email:'buy@smartfactory.kr',type:'sales',memo:'검수 까다로움, 잔금은 검수 후',aliases:['스마트팩토리'],active:1},
+    {id:'c3',name:'(주)테크노밸리',bizno:'305-86-99887',ceo:'최강일',addr:'대전 유성구 테크노4로 21',tel:'042-861-9900',email:'tv@technovalley.co.kr',type:'sales',memo:'',aliases:[],active:1},
+    {id:'c4',name:'동양철강',bizno:'606-25-73641',ceo:'김동양',addr:'부산 사상구 새벽로 45',tel:'051-311-7364',email:'dysteel@naver.com',type:'purchase',memo:'각관/철판, 월말 결제',aliases:['동양철강'],active:1},
+    {id:'c5',name:'한국전장부품(주)',bizno:'119-81-30257',ceo:'정미란',addr:'서울 금천구 가산디지털1로 168',tel:'02-2107-3025',email:'sales@kepco-parts.co.kr',type:'purchase',memo:'서보/PLC 대리점',aliases:['한국전장'],active:1},
+    {id:'c6',name:'부성모터스',bizno:'134-24-56789',ceo:'오부성',addr:'인천 남동구 남동대로 215',tel:'032-812-5678',email:'',type:'both',memo:'감속기 매입 + 수리용역 매출 겸용',aliases:[],active:1}];
+  base.items=[
+    {id:'i1',code:'P-AP200',name:'자동 포장기 AP-200',brand:'자사',spec:'220V/3P, 2열',unit:'대',kind:'product',salePrice:45000000,buyPrice:0,tax:'taxable',active:1},
+    {id:'i2',code:'P-CV10',name:'컨베이어 시스템 CV-10m',brand:'자사',spec:'벨트식 10m',unit:'식',kind:'product',salePrice:12000000,buyPrice:0,tax:'taxable',active:1},
+    {id:'i3',code:'S-INST',name:'설치 및 시운전',brand:'',spec:'',unit:'식',kind:'service',salePrice:2000000,buyPrice:0,tax:'taxable',active:1},
+    {id:'i4',code:'M-SUS40',name:'SUS304 각관 40x40',brand:'포스코',spec:'T1.5 x 6m',unit:'EA',kind:'material',salePrice:0,buyPrice:25000,tax:'taxable',active:1},
+    {id:'i5',code:'B-SV750',name:'서보모터 750W',brand:'미쓰비시',spec:'HG-KR73',unit:'EA',kind:'part',salePrice:0,buyPrice:380000,tax:'taxable',active:1},
+    {id:'i6',code:'B-PLC',name:'PLC 컨트롤러 XGB',brand:'LS일렉트릭',spec:'XBC-DR32H',unit:'EA',kind:'part',salePrice:0,buyPrice:550000,tax:'taxable',active:1},
+    {id:'i7',code:'M-AL40',name:'알루미늄 프로파일 4040',brand:'',spec:'6m',unit:'EA',kind:'material',salePrice:0,buyPrice:12000,tax:'taxable',active:1},
+    {id:'i8',code:'B-INV22',name:'인버터 2.2kW',brand:'LS일렉트릭',spec:'SV-iG5A',unit:'EA',kind:'part',salePrice:0,buyPrice:270000,tax:'taxable',active:1}];
+  base.quotes=[
+    {id:'q1',no:'Q2026-0001',companyId:'c1',date:'2026-05-02',validUntil:'2026-06-01',status:'converted',soId:'so1',memo:'',apv:{...APV_OK},lines:[L('i1','자동 포장기 AP-200','220V/3P, 2열','대',1,45000000),L('i3','설치 및 시운전','','식',1,2000000)]},
+    {id:'q2',no:'Q2026-0002',companyId:'c3',date:'2026-06-20',validUntil:'2026-07-20',status:'sent',soId:null,memo:'2호기 증설 검토분',apv:{...APV_OK,decAt:'2026-06-20'},lines:[L('i2','컨베이어 시스템 CV-10m','벨트식 10m','식',2,12000000)]}];
+  base.orders=[
+    {id:'so1',no:'SO2026-0001',quoteId:'q1',companyId:'c1',date:'2026-05-10',dueDate:'2026-08-31',status:'producing',midterm:true,memo:'8월말 납품, 검수 후 잔금',lines:[L('i1','자동 포장기 AP-200','220V/3P, 2열','대',1,45000000),L('i3','설치 및 시운전','','식',1,2000000)]},
+    {id:'so2',no:'SO2026-0002',quoteId:null,companyId:'c2',date:'2026-06-05',dueDate:'2026-07-10',status:'producing',midterm:false,memo:'긴급 건',lines:[L('i2','컨베이어 시스템 CV-10m','벨트식 10m','식',1,12000000),L('i3','설치 및 시운전','','식',1,2000000)]}];
+  base.installments=[
+    {id:'in1',orderId:'so1',seq:1,name:'계약금',trigger:'계약 시',ratio:30,amount:15510000,dueDate:'2026-05-15',status:'paid',tiId:'ti1'},
+    {id:'in2',orderId:'so1',seq:2,name:'중도금',trigger:'제작 착수',ratio:40,amount:20680000,dueDate:'2026-07-15',status:'billed',tiId:'ti2'},
+    {id:'in3',orderId:'so1',seq:3,name:'잔금',trigger:'검수 완료',ratio:30,amount:15510000,dueDate:'2026-09-10',status:'planned',tiId:null},
+    {id:'in4',orderId:'so2',seq:1,name:'계약금',trigger:'계약 시',ratio:50,amount:7700000,dueDate:'2026-06-10',status:'paid',tiId:'ti3'},
+    {id:'in5',orderId:'so2',seq:2,name:'잔금',trigger:'납품·검수',ratio:50,amount:7700000,dueDate:'2026-07-20',status:'planned',tiId:null}];
+  base.trans=[
+    {id:'tp1',no:'GR2026-0001',type:'purchase',poId:'po1',companyId:'c4',date:'2026-05-27',status:'invoiced',lines:[L('i4','SUS304 각관 40x40','T1.5 x 6m','EA',120,25000),L('i7','알루미늄 프로파일 4040','6m','EA',200,12000)]},
+    {id:'tp2',no:'GR2026-0002',type:'purchase',poId:'po3',companyId:'c5',date:'2026-06-20',status:'open',lines:[L('i8','인버터 2.2kW','SV-iG5A','EA',3,270000)]},
+    {id:'ts1',no:'DL2026-0001',type:'sales',orderId:'so2',companyId:'c2',date:'2026-07-01',status:'open',lines:[L('i2','컨베이어 시스템 CV-10m','벨트식 10m','식',1,12000000)]}];
+  base.pos=[
+    {id:'po1',no:'PO2026-0001',companyId:'c4',orderId:'so1',date:'2026-05-20',dueDate:'2026-05-27',status:'received',memo:'프레임 자재',apv:{...APV_OK,decAt:'2026-05-19'},lines:[L('i4','SUS304 각관 40x40','T1.5 x 6m','EA',120,25000),L('i7','알루미늄 프로파일 4040','6m','EA',200,12000)]},
+    {id:'po2',no:'PO2026-0002',companyId:'c5',orderId:'so1',date:'2026-06-15',dueDate:'2026-07-05',status:'ordered',memo:'구동부',apv:{status:'pending',auto:false,reqBy:'u2',reqAt:'2026-06-15',decBy:null,decAt:null,note:''},lines:[L('i5','서보모터 750W','미쓰비시 HG-KR73','EA',4,380000),L('i6','PLC 컨트롤러 XGB','LS산전 XBC-DR32H','EA',1,550000)]},
+    {id:'po3',no:'PO2026-0003',companyId:'c5',orderId:null,date:'2026-06-18',dueDate:'2026-06-20',status:'received',memo:'공통 예비품 (자재 재고)',apv:{...APV_AUTO},lines:[L('i8','인버터 2.2kW','SV-iG5A','EA',3,270000)]}];
+  base.issues=[
+    {id:'is1',date:'2026-06-25',itemId:'i8',name:'인버터 2.2kW',qty:1,unitCost:270000,orderId:'so2',note:'제어반 투입',by:'u2'}];
+  base.emailLog=[
+    {id:'em1',date:'2026-05-02',docType:'quote',docId:'q1',to:'order@dhprec.co.kr',subject:'[견적서] Q2026-0001 — (주)대한정밀 귀중',body:'',method:'mailto',by:'u2'}];
+  base.taxInvoices=[
+    {id:'ti1',no:'TI2026-0001',type:'sales',companyId:'c1',date:'2026-05-15',basis:'installment',basisId:'in1',supply:14100000,vat:1410000,status:'sent',memo:'계약금 30%',originalId:null,modifyReason:null},
+    {id:'ti2',no:'TI2026-0002',type:'sales',companyId:'c1',date:'2026-07-01',basis:'installment',basisId:'in2',supply:18800000,vat:1880000,status:'sent',memo:'중도금 40%',originalId:null,modifyReason:null},
+    {id:'ti3',no:'TI2026-0003',type:'sales',companyId:'c2',date:'2026-06-10',basis:'installment',basisId:'in4',supply:7000000,vat:700000,status:'sent',memo:'계약금 50%',originalId:null,modifyReason:null},
+    {id:'pi1',no:'PTI2026-0001',type:'purchase',companyId:'c4',date:'2026-05-31',basis:'trans',basisId:'tp1',supply:5400000,vat:540000,status:'sent',memo:'자재 매입',originalId:null,modifyReason:null}];
+  const bk=(id,date,desc,amount,balance,status)=>({id,date,desc,amount,balance,hash:date+'|'+desc+'|'+amount,status,etcNote:''});
+  base.bank=[
+    bk('b1','2026-05-16','대한정밀',15510000,35510000,'unmatched'),
+    bk('b2','2026-06-10','스마트팩토리',7700000,43210000,'unmatched'),
+    bk('b3','2026-05-28','동양철강',-5940000,29570000,'unmatched'),
+    bk('b4','2026-07-01','(주)대한정밀',20680000,55690000,'unmatched'),
+    bk('b5','2026-07-01','김재성',3000000,58690000,'unmatched'),
+    bk('b6','2026-06-30','급여 6월분',-8200000,35010000,'unmatched'),
+    bk('b7','2026-07-02','예금이자',12345,58702345,'unmatched')];
+  base.allocs=[
+    {id:'a1',bankId:'b1',targetType:'installment',targetId:'in1',amount:15510000,fee:0,date:'2026-05-16'},
+    {id:'a2',bankId:'b2',targetType:'installment',targetId:'in4',amount:7700000,fee:0,date:'2026-06-10'},
+    {id:'a3',bankId:'b3',targetType:'purchaseTrans',targetId:'tp1',amount:5940000,fee:0,date:'2026-05-28'}];
+  base.seq={Q2026:2,SO2026:2,PO2026:3,GR2026:2,DL2026:1,TI2026:3,PTI2026:1};
+  return base;}
+
+/* ================= 공용: 거래처/품목 선택 모달 ================= */
+let _pickCb=null;
+function pickCompany(cb,type){_pickCb=cb;
+  const list=DB.companies.filter(c=>c.active&&(type?(c.type===type||c.type==='both'):true));
+  openModal('<h3>거래처 선택</h3><input id="pc-q" placeholder="상호/사업자번호 검색" style="width:100%" oninput="pcFilter(this.value,\''+(type||'')+'\')"><div id="pc-list" style="margin-top:8px">'+pcRows(list)+'</div>');
+  document.getElementById('pc-q').focus();}
+function pcRows(list){return '<table><tr><th>상호</th><th>구분</th><th>사업자번호</th><th>대표</th></tr>'+list.map(c=>'<tr style="cursor:pointer" onclick="pcPick(\''+c.id+'\')"><td><b>'+esc(c.name)+'</b></td><td>'+coType(c.type)+'</td><td>'+esc(c.bizno)+'</td><td>'+esc(c.ceo)+'</td></tr>').join('')+'</table>'+(list.length?'':'<div class="mini" style="padding:10px">결과 없음</div>');}
+function pcFilter(q,type){const list=DB.companies.filter(c=>c.active&&(type?(c.type===type||c.type==='both'):true)&&(c.name.includes(q)||(c.bizno||'').includes(q)));document.getElementById('pc-list').innerHTML=pcRows(list);}
+function pcPick(id){closeModal();if(_pickCb)_pickCb(id);}
+function coType(t){return t==='sales'?'매출처':t==='purchase'?'매입처':'겸용';}
+function pickItem(cb,kinds){_pickCb=cb;window._pickKinds=kinds||null;
+  openModal('<h3>품목 선택</h3><input id="pi-q" placeholder="품목코드/품목명 검색" style="width:100%" oninput="piFilter(this.value)"><div id="pi-list" style="margin-top:8px">'+piRows(piBase(''))+'</div>');
+  document.getElementById('pi-q').focus();}
+function piBase(q){return DB.items.filter(i=>i.active&&(!window._pickKinds||window._pickKinds.includes(i.kind))&&(i.name.includes(q)||(i.code||'').includes(q)||(i.brand||'').includes(q)));}
+function piRows(list){return '<table><tr><th>코드</th><th>품목명</th><th>브랜드</th><th>규격</th><th>구분</th><th class="r">매출단가</th><th class="r">매입단가</th></tr>'+list.map(i=>'<tr style="cursor:pointer" onclick="pcPick(\''+i.id+'\')"><td>'+esc(i.code)+'</td><td><b>'+esc(i.name)+'</b></td><td>'+esc(i.brand||'')+'</td><td>'+esc(i.spec)+'</td><td>'+itemKind(i.kind)+'</td><td class="r num">'+fmt(i.salePrice)+'</td><td class="r num">'+fmt(i.buyPrice)+'</td></tr>').join('')+'</table>';}
+function piFilter(q){document.getElementById('pi-list').innerHTML=piRows(piBase(q));}
+function itemKind(k){return {product:'제품',material:'자재',part:'부품',service:'용역'}[k]||k;}
+
+/* ================= 1. 홈 (대시보드) ================= */
+function pageDash(M){
+  const recv=totalReceivable();
+  const unmatched=DB.bank.filter(b=>bankStatus(b)==='unmatched'||bankStatus(b)==='partial').length;
+  const producing=DB.orders.filter(o=>['ordered','producing'].includes(o.status));
+  const urgent=producing.filter(o=>o.dueDate&&o.dueDate<=addDays(today(),7));
+  const dueInsts=DB.installments.filter(i=>i.status==='planned'&&i.dueDate&&i.dueDate<=addDays(today(),7)&&byId(DB.orders,i.orderId)&&byId(DB.orders,i.orderId).status!=='canceled');
+  const openDl=DB.trans.filter(t=>t.type==='sales'&&t.status==='open');
+  const tm=thisMonth();
+  const mSales=DB.taxInvoices.filter(t=>t.type==='sales'&&t.status==='sent'&&t.date.startsWith(tm)).reduce((s,t)=>s+t.supply+t.vat,0);
+  const mBuy=DB.taxInvoices.filter(t=>t.type==='purchase'&&t.status==='sent'&&t.date.startsWith(tm)).reduce((s,t)=>s+t.supply+t.vat,0);
+  const payable=DB.taxInvoices.filter(t=>t.type==='purchase'&&t.status==='sent').reduce((s,t)=>s+t.supply+t.vat-ptransAlloc(t.basisId),0);
+  M.innerHTML='<h2>홈</h2><div class="crumb">오늘 '+today()+' · 모든 숫자는 저장값이 아니라 실시간 계산값입니다. 카드를 클릭하면 해당 화면으로 이동합니다.</div>'
+  +'<div class="cards">'
+  +'<div class="stat" onclick="location.hash=\'#/money/status\'"><div class="t">총 미수금 (Σ수금계획 − Σ입금)</div><div class="v" style="color:var(--bad)">'+fmt(recv)+'</div><div class="s">원</div></div>'
+  +'<div class="stat" onclick="location.hash=\'#/approvals\'"><div class="t">결재 대기</div><div class="v" style="color:var(--purple,#7e22ce)">'+pendingApvList().length+'건</div><div class="s">승인 전 다음 단계 잠김</div></div>'
+  +'<div class="stat" onclick="location.hash=\'#/reports/plan\'"><div class="t">세금계산서 발행 대기</div><div class="v">'+dueInsts.length+'건</div><div class="s">7일 내 도래 미청구 회차</div></div>'
+  +'<div class="stat" onclick="location.hash=\'#/money/bank\'"><div class="t">통장 미대사</div><div class="v" style="color:var(--warn)">'+unmatched+'건</div><div class="s">배분 확인 필요</div></div>'
+  +'<div class="stat" onclick="location.hash=\'#/orders\'"><div class="t">제작중 수주</div><div class="v">'+producing.length+'건</div><div class="s">납기 7일 내 '+urgent.length+'건</div></div>'
+  +'<div class="stat" onclick="location.hash=\'#/deliveries\'"><div class="t">미발행 납품</div><div class="v">'+openDl.length+'건</div><div class="s">계산서 미발행 거래명세서</div></div>'
+  +'<div class="stat" onclick="location.hash=\'#/invoices\'"><div class="t">이달 매출 (계산서)</div><div class="v" style="color:var(--pri)">'+fmt(mSales)+'</div><div class="s">'+tm+'</div></div>'
+  +'<div class="stat" onclick="location.hash=\'#/pinvoices\'"><div class="t">이달 매입 (계산서)</div><div class="v">'+fmt(mBuy)+'</div><div class="s">'+tm+'</div></div>'
+  +'<div class="stat" onclick="location.hash=\'#/reports/payable\'"><div class="t">미지급금</div><div class="v">'+fmt(payable)+'</div><div class="s">매입계산서 − 출금배분</div></div>'
+  +'</div>'
+  +'<div class="grid2">'
+  +'<div class="card"><h3 style="margin-top:0">납기 임박 / 제작중 수주</h3><table><tr><th>수주번호</th><th>거래처</th><th>납기</th><th class="r">계약액</th><th>상태</th></tr>'
+  +(producing.map(o=>'<tr><td><a class="lnk" href="#/orders/view/'+o.id+'">'+o.no+'</a></td><td>'+esc(co(o.companyId).name)+'</td><td'+(o.dueDate<=addDays(today(),7)?' style="color:var(--bad);font-weight:bold"':'')+'>'+(o.dueDate||'')+'</td><td class="r num">'+fmt(orderTotal(o))+'</td><td>'+badge('order',o.status)+'</td></tr>').join('')||'<tr><td colspan="5" class="mini">없음</td></tr>')+'</table></div>'
+  +'<div class="card"><h3 style="margin-top:0">수금 예정 (60일 내 도래 회차)</h3><table><tr><th>수주</th><th>회차</th><th>예정일</th><th class="r">금액</th><th class="r">입금</th><th>상태</th></tr>'
+  +dashInstRows()+'</table></div>'
+  +'</div>';}
+function dashInstRows(){
+  const till=addDays(today(),62);
+  const rows=DB.installments.filter(i=>{const o=byId(DB.orders,i.orderId);return o&&o.status!=='canceled'&&i.status!=='paid'&&i.dueDate&&i.dueDate<=till;}).sort((a,b)=>a.dueDate<b.dueDate?-1:1);
+  return rows.map(i=>{const o=byId(DB.orders,i.orderId);return '<tr><td><a class="lnk" href="#/orders/view/'+o.id+'">'+o.no+'</a></td><td>'+esc(i.name)+'</td><td'+(i.dueDate<today()?' style="color:var(--bad);font-weight:bold"':'')+'>'+i.dueDate+'</td><td class="r num">'+fmt(i.amount)+'</td><td class="r num">'+fmt(instAlloc(i.id))+'</td><td>'+badge('inst',i.status)+'</td></tr>';}).join('')||'<tr><td colspan="6" class="mini">없음</td></tr>';}
+
+/* ================= 2. 거래처 ================= */
+let _coQ='',_coType='';
+function pageCompanies(M){
+  const list=DB.companies.filter(c=>(!_coType||c.type===_coType||c.type==='both')&&(c.name.includes(_coQ)||(c.bizno||'').includes(_coQ)));
+  M.innerHTML='<h2>거래처</h2><div class="crumb">매출처·매입처·겸용 · 삭제 대신 비활성 처리 · 다른 문서에서 선택 시 정보 자동 입력</div>'
+  +'<div class="card"><div class="bar"><input placeholder="상호/사업자번호 검색" value="'+esc(_coQ)+'" oninput="_coQ=this.value;pageCompanies(document.getElementById(\'main\'))" style="width:220px">'
+  +'<select onchange="_coType=this.value;pageCompanies(document.getElementById(\'main\'))"><option value="">전체 구분</option><option value="sales"'+(_coType==='sales'?' selected':'')+'>매출처</option><option value="purchase"'+(_coType==='purchase'?' selected':'')+'>매입처</option></select>'
+  +'<div class="sp"></div><button class="pri" onclick="location.hash=\'#/companies/edit/new\'">+ 거래처 등록</button></div>'
+  +'<table><tr><th>상호</th><th>구분</th><th>사업자번호</th><th>대표자</th><th>연락처</th><th class="r">미수금</th><th class="r">미지급금</th><th class="c">상태</th><th></th></tr>'
+  +list.map(c=>{
+    const recv=DB.orders.filter(o=>o.companyId===c.id&&o.status!=='canceled').reduce((s,o)=>s+orderReceivable(o),0);
+    const pay=DB.taxInvoices.filter(t=>t.type==='purchase'&&t.companyId===c.id&&t.status==='sent').reduce((s,t)=>s+t.supply+t.vat-ptransAlloc(t.basisId),0);
+    return '<tr'+(c.active?'':' style="opacity:.5"')+'><td><a class="lnk" href="#/reports/ledger?c='+c.id+'"><b>'+esc(c.name)+'</b></a></td><td>'+coType(c.type)+'</td><td>'+esc(c.bizno)+'</td><td>'+esc(c.ceo)+'</td><td>'+esc(c.tel)+'</td><td class="r num">'+(recv?'<span style="color:var(--bad)">'+fmt(recv)+'</span>':'-')+'</td><td class="r num">'+(pay?fmt(pay):'-')+'</td><td class="c">'+(c.active?'<span class="badge b-green">사용</span>':'<span class="badge b-gray">비활성</span>')+'</td><td><button class="sm" onclick="location.hash=\'#/companies/edit/'+c.id+'\'">수정</button></td></tr>';}).join('')
+  +'</table><div class="mini" style="margin-top:6px">상호를 클릭하면 거래처 원장으로 이동합니다.</div></div>';}
+function pageCompanyEdit(M,id){
+  const isNew=id==='new';const c=isNew?{name:'',bizno:'',ceo:'',addr:'',tel:'',email:'',type:'sales',memo:'',aliases:[],active:1}:byId(DB.companies,id);
+  if(!c){M.innerHTML='없음';return;}
+  M.innerHTML='<h2>'+(isNew?'거래처 등록':'거래처 수정')+'</h2><div class="crumb"><a class="lnk" href="#/companies">← 거래처 목록</a></div>'
+  +'<div class="card"><div class="frm">'
+  +'<div><label>상호 *</label><input id="f-name" value="'+esc(c.name)+'"></div>'
+  +'<div><label>사업자번호</label><input id="f-bizno" value="'+esc(c.bizno)+'" placeholder="000-00-00000"></div>'
+  +'<div><label>대표자</label><input id="f-ceo" value="'+esc(c.ceo)+'"></div>'
+  +'<div><label>구분</label><select id="f-type"><option value="sales"'+(c.type==='sales'?' selected':'')+'>매출처</option><option value="purchase"'+(c.type==='purchase'?' selected':'')+'>매입처</option><option value="both"'+(c.type==='both'?' selected':'')+'>겸용</option></select></div>'
+  +'<div class="full"><label>주소</label><input id="f-addr" value="'+esc(c.addr)+'"></div>'
+  +'<div><label>연락처</label><input id="f-tel" value="'+esc(c.tel)+'"></div>'
+  +'<div><label>이메일</label><input id="f-email" value="'+esc(c.email)+'"></div>'
+  +'<div class="full"><label>입금자명 별칭 (통장 대사 자동추천에 사용, 쉼표 구분)</label><input id="f-alias" value="'+esc((c.aliases||[]).join(', '))+'"></div>'
+  +'<div class="full"><label>메모</label><textarea id="f-memo" rows="2" style="width:100%">'+esc(c.memo)+'</textarea></div>'
+  +'</div><div class="bar" style="margin-top:12px"><button class="pri" onclick="saveCompany(\''+(isNew?'':c.id)+'\')">저장</button>'
+  +(isNew?'':'<button onclick="toggleCompany(\''+c.id+'\')">'+(c.active?'비활성 처리':'다시 활성화')+'</button>')
+  +'<a class="lnk" style="margin-left:8px" href="#/companies">취소</a></div>'
+  +(isNew?'':'<div class="mini">거래처는 언제든 수정 가능하며, 삭제 대신 비활성 처리합니다(과거 문서 보존).</div>')+'</div>';}
+function saveCompany(id){
+  const g=x=>document.getElementById(x).value.trim();
+  const name=g('f-name');if(!name){toast('상호를 입력하세요');return;}
+  const bizno=g('f-bizno');
+  const dup=DB.companies.find(c=>c.bizno&&bizno&&c.bizno===bizno&&c.id!==id);
+  if(dup&&!confirm('사업자번호가 "'+dup.name+'"와(과) 중복됩니다. 그래도 저장할까요?'))return;
+  const data={name,bizno,ceo:g('f-ceo'),addr:g('f-addr'),tel:g('f-tel'),email:g('f-email'),type:document.getElementById('f-type').value,memo:g('f-memo'),aliases:g('f-alias').split(',').map(s=>s.trim()).filter(Boolean)};
+  if(id){const c=byId(DB.companies,id);Object.assign(c,data);touch(c);}else{DB.companies.push(Object.assign({id:uid('c'),active:1},data));}
+  saveDB();toast('저장되었습니다');location.hash='#/companies';}
+function toggleCompany(id){const c=byId(DB.companies,id);c.active=c.active?0:1;touch(c);saveDB();route();toast(c.active?'활성화됨':'비활성 처리됨 (과거 문서는 유지)');}
+
+/* ================= 3. 품목 ================= */
+let _itQ='',_itKind='';
+function pageItems(M){
+  const list=DB.items.filter(i=>(!_itKind||i.kind===_itKind)&&(i.name.includes(_itQ)||(i.code||'').includes(_itQ)||(i.brand||'').includes(_itQ)));
+  M.innerHTML='<h2>품목</h2><div class="crumb">기준 단가 관리 · 단가를 바꿔도 과거 문서 금액은 불변(스냅샷) · 삭제 대신 비활성</div>'
+  +'<div class="card"><div class="bar"><input placeholder="코드/품목명/브랜드 검색" value="'+esc(_itQ)+'" oninput="_itQ=this.value;pageItems(document.getElementById(\'main\'))" style="width:220px">'
+  +'<select onchange="_itKind=this.value;pageItems(document.getElementById(\'main\'))"><option value="">전체 구분</option>'+['product','material','part','service'].map(k=>'<option value="'+k+'"'+(_itKind===k?' selected':'')+'>'+itemKind(k)+'</option>').join('')+'</select>'
+  +'<div class="sp"></div><button class="pri" onclick="location.hash=\'#/items/edit/new\'">+ 품목 등록</button></div>'
+  +'<table><tr><th>코드</th><th>품목명</th><th>브랜드</th><th>규격</th><th>단위</th><th>구분</th><th class="r">매출단가</th><th class="r">매입단가</th><th class="c">과세</th><th class="c">상태</th><th></th></tr>'
+  +list.map(i=>'<tr'+(i.active?'':' style="opacity:.5"')+'><td>'+esc(i.code)+'</td><td><b>'+esc(i.name)+'</b></td><td>'+esc(i.brand||'')+'</td><td>'+esc(i.spec)+'</td><td>'+esc(i.unit)+'</td><td>'+itemKind(i.kind)+'</td><td class="r num">'+fmt(i.salePrice)+'</td><td class="r num">'+fmt(i.buyPrice)+'</td><td class="c">'+(i.tax==='exempt'?'면세':'과세')+'</td><td class="c">'+(i.active?'<span class="badge b-green">사용</span>':'<span class="badge b-gray">비활성</span>')+'</td><td><button class="sm" onclick="location.hash=\'#/items/edit/'+i.id+'\'">수정</button></td></tr>').join('')
+  +'</table></div>';}
+function pageItemEdit(M,id){
+  const isNew=id==='new';const i=isNew?{code:'',name:'',brand:'',spec:'',unit:'EA',kind:'product',salePrice:0,buyPrice:0,tax:'taxable',active:1}:byId(DB.items,id);
+  if(!i){M.innerHTML='없음';return;}
+  M.innerHTML='<h2>'+(isNew?'품목 등록':'품목 수정')+'</h2><div class="crumb"><a class="lnk" href="#/items">← 품목 목록</a></div>'
+  +'<div class="card"><div class="frm">'
+  +'<div><label>품목코드</label><input id="f-code" value="'+esc(i.code)+'"></div>'
+  +'<div class="full"><label>품목명 *</label><input id="f-iname" value="'+esc(i.name)+'"></div>'
+  +'<div><label>브랜드 (제조사/메이커)</label><input id="f-brand" value="'+esc(i.brand||'')+'" placeholder="예: 미쓰비시, LS일렉트릭, 자사"></div>'
+  +'<div><label>규격</label><input id="f-spec" value="'+esc(i.spec)+'"></div>'
+  +'<div><label>단위</label><input id="f-unit" value="'+esc(i.unit)+'"></div>'
+  +'<div><label>구분</label><select id="f-kind">'+['product','material','part','service'].map(k=>'<option value="'+k+'"'+(i.kind===k?' selected':'')+'>'+itemKind(k)+(k==='product'?' (판매)':k==='service'?'':' (구매)')+'</option>').join('')+'</select></div>'
+  +'<div><label>과세 구분</label><select id="f-tax"><option value="taxable"'+(i.tax==='taxable'?' selected':'')+'>과세</option><option value="exempt"'+(i.tax==='exempt'?' selected':'')+'>면세</option></select></div>'
+  +'<div><label>매출단가 (원)</label><input class="r" id="f-sale" value="'+(i.salePrice||0)+'"></div>'
+  +'<div><label>매입단가 (원)</label><input class="r" id="f-buy" value="'+(i.buyPrice||0)+'"></div>'
+  +'</div><div class="bar" style="margin-top:12px"><button class="pri" onclick="saveItem(\''+(isNew?'':i.id)+'\')">저장</button>'
+  +(isNew?'':'<button onclick="toggleItem(\''+i.id+'\')">'+(i.active?'비활성 처리':'다시 활성화')+'</button>')
+  +'<a class="lnk" style="margin-left:8px" href="#/items">취소</a></div>'
+  +'<div class="mini">단가는 문서 작성 시의 "기본값"일 뿐입니다. 과거 문서에는 작성 당시 품명·단가가 스냅샷으로 저장되어 변하지 않습니다.</div></div>';}
+function saveItem(id){
+  const g=x=>document.getElementById(x).value.trim();
+  if(!g('f-iname')){toast('품목명을 입력하세요');return;}
+  const data={code:g('f-code'),name:g('f-iname'),brand:g('f-brand'),spec:g('f-spec'),unit:g('f-unit'),kind:document.getElementById('f-kind').value,tax:document.getElementById('f-tax').value,salePrice:Math.round(+g('f-sale').replace(/,/g,'')||0),buyPrice:Math.round(+g('f-buy').replace(/,/g,'')||0)};
+  if(id){const it=byId(DB.items,id);Object.assign(it,data);touch(it);}else{DB.items.push(Object.assign({id:uid('i'),active:1},data));}
+  saveDB();toast('저장되었습니다');location.hash='#/items';}
+function toggleItem(id){const i=byId(DB.items,id);i.active=i.active?0:1;touch(i);saveDB();route();}
+
+/* ================= 4. 영업 (견적→수주→납품→세금계산서) ================= */
+function salesTabs(cur){
+  const t=[['quotes','견적서',DB.quotes.length],['orders','수주(계약)',DB.orders.length],['deliveries','거래명세서(납품)',DB.trans.filter(t=>t.type==='sales').length],['invoices','세금계산서(매출)',DB.taxInvoices.filter(t=>t.type==='sales').length]];
+  return '<div class="tabs">'+t.map(x=>'<a href="#/'+x[0]+'"'+(cur===x[0]?' class="on"':'')+'>'+x[1]+' ('+x[2]+')</a>').join('')+'</div>';}
+let _stFilter={quotes:'',orders:'',deliveries:'',invoices:''};
+function pageSales(M,tab){
+  let body='';
+  if(tab==='quotes')body=quotesList();
+  else if(tab==='orders')body=ordersList();
+  else if(tab==='deliveries')body=deliveriesList();
+  else body=invoicesList('sales');
+  M.innerHTML='<h2>영업 (매출)</h2><div class="crumb">견적 → 수주(수금계획) → 납품 → 세금계산서 · 문서는 재입력 없이 버튼으로 전환됩니다</div>'+salesTabs(tab)+body;}
+
+/* ---- 4-1. 견적서 ---- */
+function quotesList(){
+  const f=_stFilter.quotes;
+  const list=DB.quotes.filter(q=>!f||q.status===f).sort((a,b)=>a.no<b.no?1:-1);
+  const cnt=s=>DB.quotes.filter(q=>q.status===s).length;
+  return '<div class="card"><div class="bar">'
+  +['','draft','sent','converted','lost'].map(s=>'<a class="lnk" style="'+(f===s?'font-weight:bold':'')+'" onclick="_stFilter.quotes=\''+s+'\';route()">'+(s?ST.quote[s][0]+' '+cnt(s):'전체 '+DB.quotes.length)+'</a>').join(' · ')
+  +'<div class="sp"></div><button class="pri" onclick="location.hash=\'#/quotes/edit/new\'">+ 견적서 작성</button></div>'
+  +'<table><tr><th>견적번호</th><th>거래처</th><th>견적일</th><th class="r">합계(VAT포함)</th><th>결재</th><th>상태</th><th>작업</th></tr>'
+  +list.map(q=>{const t=lineTotals(q.lines);const a=apvOf(q);const ok=quoteApvOk(q);
+    return '<tr><td><a class="lnk" href="#/quotes/edit/'+q.id+'">'+q.no+'</a></td><td>'+esc(co(q.companyId).name)+'</td><td>'+q.date+'</td><td class="r num"><b>'+fmt(t.total)+'</b></td>'
+    +'<td>'+(DB.settings.quoteApproval?apvBadge(q):'<span class="mini">결재 생략</span>')+'</td>'
+    +'<td>'+badge('quote',q.status)+(q.soId?' <a class="lnk mini" href="#/orders/view/'+q.soId+'">→수주</a>':'')+'</td>'
+    +'<td>'+(DB.settings.quoteApproval&&['none','rejected'].includes(a.status)&&['draft','sent'].includes(q.status)?'<button class="sm" onclick="submitApv(\'quote\',\''+q.id+'\')">상신</button> ':'')
+    +(['draft','sent'].includes(q.status)&&ok?'<button class="sm" onclick="emailModal(\'quote\',\''+q.id+'\')">메일</button> ':'')
+    +(q.status==='draft'?'<button class="sm" onclick="quoteSend(\''+q.id+'\')">발송</button> ':'')
+    +(['draft','sent'].includes(q.status)?'<button class="sm pri" onclick="quoteConvert(\''+q.id+'\')">수주 전환</button> <button class="sm" onclick="quoteLost(\''+q.id+'\')">실주</button> ':'')
+    +'<button class="sm" onclick="quoteCopy(\''+q.id+'\')">복사</button>'
+    +(q.status==='draft'?' <button class="sm danger" onclick="quoteDel(\''+q.id+'\')">삭제</button>':'')+'</td></tr>';}).join('')
+  +'</table><div class="mini" style="margin-top:6px">견적은 결재 승인 후에 발송·메일·수주전환이 가능합니다(결재함에서 설정 변경 가능). 수주 전환된 견적은 읽기전용.</div></div>';}
+function quoteSend(id){const q=byId(DB.quotes,id);
+  if(!quoteApvOk(q)){toast('⚠ 결재 승인 후 발송할 수 있습니다');return;}
+  q.status='sent';touch(q);saveDB();route();toast('발송 처리되었습니다');}
+function quoteLost(id){const q=byId(DB.quotes,id);if(!confirm('실주 처리할까요?'))return;q.status='lost';touch(q);saveDB();route();}
+function quoteDel(id){if(!confirm('견적서를 삭제할까요? (작성중 상태만 삭제 가능)'))return;DB.quotes=DB.quotes.filter(q=>q.id!==id);saveDB();route();}
+function quoteCopy(id){const q=byId(DB.quotes,id);
+  const n={id:uid('q'),no:docNo('Q'),companyId:q.companyId,date:today(),validUntil:addDays(today(),30),status:'draft',soId:null,memo:'['+q.no+' 복사] '+(q.memo||''),lines:q.lines.map(l=>({...l}))};
+  DB.quotes.push(n);saveDB();location.hash='#/quotes/edit/'+n.id;toast('복사본이 만들어졌습니다');}
+function quoteConvert(id){const q=byId(DB.quotes,id);
+  if(!quoteApvOk(q)){toast('⚠ 결재 승인 후 수주 전환할 수 있습니다');return;}
+  if(!confirm('이 견적을 수주(계약)로 전환할까요?\n품목 라인이 그대로 복사되고 견적은 읽기전용이 됩니다.'))return;
+  const o={id:uid('so'),no:docNo('SO'),quoteId:q.id,companyId:q.companyId,date:today(),dueDate:addDays(today(),60),status:'ordered',midterm:false,memo:'',lines:q.lines.map(l=>({...l}))};
+  DB.orders.push(o);q.status='converted';q.soId=o.id;touch(q);saveDB();
+  location.hash='#/orders/view/'+o.id;toast('수주로 전환되었습니다. 수금계획을 설정하세요.');}
+
+/* ---- 견적서 작성/수정 (라인 그리드) ---- */
+let ED=null;
+function pageQuoteEdit(M,id){
+  const isNew=id==='new';
+  const q=isNew?{companyId:null,date:today(),validUntil:addDays(today(),30),memo:'',status:'draft',lines:[]}:byId(DB.quotes,id);
+  if(!q){M.innerHTML='없음';return;}
+  const ro=!isNew&&['converted','lost'].includes(q.status);
+  ED={type:'quote',id:isNew?null:q.id,companyId:q.companyId,lines:q.lines.map(l=>({...l})),ro};
+  M.innerHTML='<h2>'+(isNew?'견적서 작성':'견적서 '+q.no)+' '+(!isNew?badge('quote',q.status):'')+'</h2>'
+  +'<div class="crumb"><a class="lnk" href="#/quotes">← 견적 목록</a>'+(q.soId?' · <a class="lnk" href="#/orders/view/'+q.soId+'">전환된 수주 보기 →</a>':'')+'</div>'
+  +(ro?'<div class="warnbox">이 견적은 '+(q.status==='converted'?'수주로 전환되어':'실주 처리되어')+' 읽기전용입니다. 변경이 필요하면 [복사]로 새 견적을 만드세요.</div>':'')
+  +'<div class="card"><div class="frm">'
+  +'<div><label>거래처 *</label><div class="bar" style="margin:0"><input id="f-co" value="'+esc(q.companyId?co(q.companyId).name:'')+'" disabled style="flex:1"><button '+(ro?'disabled':'')+' onclick="pickCompany(cid=>{ED.companyId=cid;document.getElementById(\'f-co\').value=co(cid).name;},\'sales\')">선택</button></div></div>'
+  +'<div><label>견적일</label><input type="date" id="f-date" value="'+q.date+'" '+(ro?'disabled':'')+'></div>'
+  +'<div><label>유효기간</label><input type="date" id="f-valid" value="'+(q.validUntil||'')+'" '+(ro?'disabled':'')+'></div>'
+  +'<div class="full"><label>메모</label><input id="f-memo" value="'+esc(q.memo)+'" '+(ro?'disabled':'')+'></div>'
+  +'</div>'
+  +'<h3>품목 라인</h3><div id="ed-lines"></div>'
+  +'<div class="bar" style="margin-top:12px">'+(ro?'':'<button class="pri" onclick="saveQuote()">저장</button>')+'<a class="lnk" href="#/quotes">닫기</a></div></div>';
+  renderEdLines();}
+function renderEdLines(){
+  const el=document.getElementById('ed-lines');if(!el)return;
+  const t=lineTotals(ED.lines);
+  el.innerHTML='<table><tr><th style="width:26%">품목</th><th>규격</th><th style="width:55px">단위</th><th class="r" style="width:70px">수량</th><th class="r" style="width:110px">단가</th><th class="r">공급가액</th><th class="r">부가세</th><th class="r">합계</th><th></th></tr>'
+  +ED.lines.map((l,i)=>'<tr><td>'+(ED.ro?esc(l.name):'<a class="lnk" onclick="edPickItem('+i+')">'+(l.name?esc(l.name):'[품목 선택]')+'</a>')+'</td>'
+    +'<td>'+esc(l.spec||'')+'</td><td>'+esc(l.unit||'')+'</td>'
+    +'<td class="r">'+(ED.ro?fmt(l.qty):'<input class="r" style="width:60px" value="'+l.qty+'" onchange="edChg('+i+',\'qty\',this.value)">')+'</td>'
+    +'<td class="r">'+(ED.ro?fmt(l.price):'<input class="r" style="width:105px" value="'+l.price+'" onchange="edChg('+i+',\'price\',this.value)">')+'</td>'
+    +'<td class="r num">'+fmt(l.supply)+'</td><td class="r num">'+fmt(l.vat)+'</td><td class="r num"><b>'+fmt(l.supply+l.vat)+'</b></td>'
+    +'<td>'+(ED.ro?'':'<button class="sm danger" onclick="edDel('+i+')">✕</button>')+'</td></tr>').join('')
+  +'<tr><td colspan="5" style="text-align:right"><b>합계</b> <span class="mini">(금액은 라인에서 자동 집계 — 직접 입력 불가)</span></td><td class="r num"><b>'+fmt(t.supply)+'</b></td><td class="r num"><b>'+fmt(t.vat)+'</b></td><td class="r num"><b style="color:var(--pri)">'+fmt(t.total)+'</b></td><td></td></tr></table>'
+  +(ED.ro?'':'<button class="sm" style="margin-top:8px" onclick="edAdd()">+ 라인 추가</button>');}
+function edPickItem(i){pickItem(iid=>{const it=byId(DB.items,iid);const l=ED.lines[i];
+  l.itemId=iid;l.name=it.name;l.spec=it.spec;l.unit=it.unit;
+  l.price=ED.type==='po'?it.buyPrice:(it.salePrice||it.buyPrice);calcLine(l,it.tax==='exempt');renderEdLines();},ED.type==='po'?['material','part','service']:null);}
+function edChg(i,k,v){const l=ED.lines[i];l[k]=+String(v).replace(/,/g,'')||0;
+  const it=l.itemId?byId(DB.items,l.itemId):null;calcLine(l,it&&it.tax==='exempt');renderEdLines();}
+function edAdd(){ED.lines.push({itemId:null,name:'',spec:'',unit:'',qty:1,price:0,supply:0,vat:0});renderEdLines();}
+function edDel(i){ED.lines.splice(i,1);renderEdLines();}
+function saveQuote(){
+  if(!ED.companyId){toast('거래처를 선택하세요');return;}
+  if(!ED.lines.length||ED.lines.every(l=>!l.name)){toast('품목 라인을 입력하세요');return;}
+  const g=x=>document.getElementById(x).value;
+  const data={companyId:ED.companyId,date:g('f-date'),validUntil:g('f-valid'),memo:g('f-memo'),lines:ED.lines.filter(l=>l.name)};
+  if(ED.id){const q=byId(DB.quotes,ED.id);Object.assign(q,data);touch(q);
+    if(resetApvIfNeeded(q))toast('내용이 수정되어 결재가 리셋되었습니다 — 재상신 필요');}
+  else{DB.quotes.push(Object.assign({id:uid('q'),no:docNo('Q',data.date),status:'draft',soId:null,apv:{status:'none'}},data));}
+  saveDB();toast('저장되었습니다');location.hash='#/quotes';}
+
+/* ---- 4-2. 수주 (핵심 허브) ---- */
+function ordersList(){
+  const f=_stFilter.orders;
+  const list=DB.orders.filter(o=>!f||o.status===f).sort((a,b)=>a.no<b.no?1:-1);
+  const cnt=s=>DB.orders.filter(o=>o.status===s).length;
+  return '<div class="card"><div class="bar">'
+  +['','ordered','producing','delivered','closed','canceled'].map(s=>'<a class="lnk" style="'+(f===s?'font-weight:bold':'')+'" onclick="_stFilter.orders=\''+s+'\';route()">'+(s?ST.order[s][0]+' '+cnt(s):'전체 '+DB.orders.length)+'</a>').join(' · ')
+  +'<div class="sp"></div><button class="pri" onclick="location.hash=\'#/orders/edit/new\'">+ 수주 직접 등록</button></div>'
+  +'<table><tr><th>수주번호</th><th>거래처</th><th>계약일</th><th>납기</th><th class="r">계약액(VAT포함)</th><th class="r">수금</th><th class="r">미수</th><th>수금계획</th><th>상태</th></tr>'
+  +list.map(o=>{const tot=orderTotal(o);const ins=orderInsts(o.id);const paid=ins.reduce((s,i)=>s+instAlloc(i.id),0);
+    const planned=ins.reduce((s,i)=>s+i.amount,0);
+    return '<tr><td><a class="lnk" href="#/orders/view/'+o.id+'"><b>'+o.no+'</b></a></td><td>'+esc(co(o.companyId).name)+'</td><td>'+o.date+'</td><td>'+(o.dueDate||'')+'</td><td class="r num">'+fmt(tot)+'</td><td class="r num">'+fmt(paid)+'</td><td class="r num"'+(planned-paid>0?' style="color:var(--bad)"':'')+'>'+fmt(planned-paid)+'</td>'
+    +'<td>'+(ins.length?ins.length+'회차'+(Math.abs(planned-tot)>0?' <span class="badge b-red" title="회차 합계가 계약액과 다릅니다">합계불일치</span>':''):'<span class="badge b-amber">미설정</span>')+'</td><td>'+badge('order',o.status)+'</td></tr>';}).join('')
+  +'</table></div>';}
+function pageOrderView(M,id){
+  const o=byId(DB.orders,id);if(!o){M.innerHTML='없음';return;}
+  const c=co(o.companyId);const tot=orderTotal(o);const t=lineTotals(o.lines);
+  const ins=orderInsts(o.id);const planned=ins.reduce((s,i)=>s+i.amount,0);const paid=ins.reduce((s,i)=>s+instAlloc(i.id),0);
+  const dq=deliveredQty(o.id);
+  const dls=DB.trans.filter(x=>x.type==='sales'&&x.orderId===o.id);
+  const pos=DB.pos.filter(p=>p.orderId===o.id);
+  const poAmt=pos.reduce((s,p)=>s+lineTotals(p.lines).supply,0);
+  const matCost=orderMaterialCost(o.id);
+  const tis=DB.taxInvoices.filter(ti=>ti.type==='sales'&&((ti.basis==='order'&&ti.basisId===o.id)||(ti.basis==='installment'&&ins.some(i=>i.id===ti.basisId))||(ti.basis==='trans'&&dls.some(d=>d.id===ti.basisId))));
+  const allocRows=DB.allocs.filter(a=>a.targetType==='installment'&&ins.some(i=>i.id===a.targetId));
+  const locked=['closed','canceled'].includes(o.status);
+  const profit=t.supply-matCost;const margin=t.supply?Math.round(profit/t.supply*100):0;
+  M.innerHTML='<h2>수주 '+o.no+' '+badge('order',o.status)+(o.midterm?' <span class="badge b-purple" title="계약금~잔금 6개월 이상: 회차별 세금계산서 발행 의무">중간지급조건부</span>':'')+'</h2>'
+  +'<div class="crumb"><a class="lnk" href="#/orders">← 수주 목록</a> · 거래처: <a class="lnk" href="#/reports/ledger?c='+o.companyId+'">'+esc(c.name)+'</a> · 계약일 '+o.date+' · 납기 '+(o.dueDate||'-')+'</div>'
+  +'<div class="bar">'
+  +(o.status==='ordered'?'<button class="pri" onclick="orderStatus(\''+o.id+'\',\'producing\')">제작 시작</button>':'')
+  +(['ordered','producing'].includes(o.status)?'<button class="pri" onclick="deliveryModal(\''+o.id+'\')">납품 생성 (거래명세서)</button><button onclick="poFromOrder(\''+o.id+'\')">이 수주용 발주 생성</button>':'')
+  +(!locked?'<button onclick="issueModal(\'order\',\''+o.id+'\')">계산서 발행 (수주 전체)</button><button onclick="location.hash=\'#/orders/edit/'+o.id+'\'">수정</button>':'')
+  +(o.status==='delivered'?'<button onclick="orderClose(\''+o.id+'\')">종결 처리</button>':'')
+  +(!locked?'<button class="danger" onclick="orderCancel(\''+o.id+'\')">수주 취소</button>':'')
+  +(o.status==='closed'?'<span class="mini">종결된 수주는 잠금 상태입니다.</span>':'')+(o.status==='canceled'?'<span class="mini">취소된 수주입니다.</span>':'')
+  +'</div>'
+  +'<div class="grid2"><div>'
+  +'<div class="card"><h3 style="margin-top:0">품목 라인 <span class="mini">(납품 잔량 자동 추적)</span></h3>'
+  +'<table><tr><th>품목</th><th>규격</th><th class="r">수량</th><th class="r">단가</th><th class="r">공급가액</th><th class="r">납품됨</th><th class="r">잔량</th></tr>'
+  +o.lines.map(l=>{const k=(l.itemId||'')+'|'+l.name;const d=dq[k]||0;
+    return '<tr><td>'+esc(l.name)+'</td><td>'+esc(l.spec||'')+'</td><td class="r num">'+fmt(l.qty)+'</td><td class="r num">'+fmt(l.price)+'</td><td class="r num">'+fmt(l.supply)+'</td><td class="r num">'+fmt(d)+'</td><td class="r num"'+(l.qty-d>0?'':' style="color:var(--ok)"')+'>'+fmt(l.qty-d)+'</td></tr>';}).join('')
+  +'<tr><td colspan="4" style="text-align:right"><b>합계</b></td><td class="r num"><b>'+fmt(t.supply)+'</b></td><td colspan="2" class="r num">부가세 '+fmt(t.vat)+' / <b style="color:var(--pri)">총 '+fmt(tot)+'</b></td></tr></table>'
+  +(o.memo?'<div class="mini" style="margin-top:6px">메모: '+esc(o.memo)+'</div>':'')+'</div>'
+  +'<div class="card"><h3 style="margin-top:0">수금계획 (계약금/중도금/잔금) <span class="mini">회차 합계 = 계약액이어야 합니다</span></h3>'
+  +instTable(o,ins,locked)
+  +(Math.abs(planned-tot)>0&&ins.length?'<div class="warnbox">⚠ 회차 합계 '+fmt(planned)+'원 ≠ 계약액 '+fmt(tot)+'원 (차이 '+fmt(tot-planned)+'원)</div>':'')
+  +(!ins.length?'<div class="warnbox">수금계획이 없습니다. 회차를 추가하세요 — 미수금 계산의 기준이 됩니다.</div>':'')
+  +(!locked?'<div class="bar" style="margin-top:8px"><button class="sm pri" onclick="instAdd(\''+o.id+'\')">+ 회차 추가</button><button class="sm" onclick="instAutoFill(\''+o.id+'\')">잔여 자동 채움</button><button class="sm" onclick="instPreset(\''+o.id+'\')">30/40/30 자동 생성</button></div>':'')
+  +'</div></div><div>'
+  +'<div class="card"><h3 style="margin-top:0">원가·손익 (프로젝트 전체 단가, 실시간)</h3>'
+  +'<table><tr><td>계약액(공급가)</td><td class="r num"><b>'+fmt(t.supply)+'</b></td></tr>'
+  +'<tr><td>발주액 (연결 발주 '+pos.length+'건)</td><td class="r num">'+fmt(poAmt)+'</td></tr>'
+  +'<tr><td>├ 직납 자재비 (수주 연결 발주 입고)</td><td class="r num">'+fmt(orderDirectCost(o.id))+'</td></tr>'
+  +'<tr><td>├ 공용자재 불출 (사용처리)</td><td class="r num">'+fmt(orderIssueCost(o.id))+'</td></tr>'
+  +'<tr><td><b>자재비 합계</b></td><td class="r num"><b>'+fmt(matCost)+'</b></td></tr>'
+  +'<tr><td><b>이익 (계약 − 자재비)</b></td><td class="r num"'+(profit<0?' style="color:var(--bad)"':'')+'><b>'+fmt(profit)+'</b></td></tr></table>'
+  +'<div class="bar" style="margin-top:8px"><button class="sm" onclick="matDetailModal(\''+o.id+'\')">자재 투입 내역 (이력 전체)</button></div>'
+  +'<div style="margin-top:8px"><div class="mini">이익률 '+margin+'% <span style="color:var(--sub)">(노무비·경비 제외, 자재비만)</span></div><div class="gaugewrap" style="margin-top:4px"><div class="gauge" style="width:'+Math.max(0,Math.min(100,margin))+'%;background:'+(margin<15?'var(--bad)':margin<30?'var(--warn)':'var(--ok)')+'"></div></div></div></div>'
+  +'<div class="card"><h3 style="margin-top:0">수금 현황</h3>'
+  +'<table><tr><td>수금계획 합계</td><td class="r num">'+fmt(planned)+'</td></tr><tr><td>입금 배분 누계</td><td class="r num" style="color:var(--ok)">'+fmt(paid)+'</td></tr><tr><td><b>미수 잔액</b></td><td class="r num" style="color:var(--bad)"><b>'+fmt(planned-paid)+'</b></td></tr></table></div>'
+  +'<div class="linkpanel"><b>연결 문서 (상호 연결 지도)</b>'
+  +'<div class="row">견적 원본: '+(o.quoteId?'<a class="lnk" href="#/quotes/edit/'+o.quoteId+'">'+(byId(DB.quotes,o.quoteId)||{}).no+'</a>':'<span class="mini">직접 등록</span>')+'</div>'
+  +'<div class="row">거래명세서(납품): '+(dls.map(d=>'<a class="lnk" onclick="dlView(\''+d.id+'\')">'+d.no+'</a>').join(', ')||'<span class="mini">없음</span>')+'</div>'
+  +'<div class="row">세금계산서: '+(tis.map(x=>'<a class="lnk" href="#/invoices">'+x.no+'</a> '+badge('ti',x.status)).join(' · ')||'<span class="mini">없음</span>')+'</div>'
+  +'<div class="row">발주서(자재): '+(pos.map(p=>'<a class="lnk" href="#/po/view/'+p.id+'">'+p.no+'</a>').join(', ')||'<span class="mini">없음</span>')+'</div>'
+  +'<div class="row">입금 배분: '+(allocRows.map(a=>{const b=byId(DB.bank,a.bankId);return '<a class="lnk" href="#/money/bank">'+(b?b.date+' '+esc(b.desc):'')+' '+fmt(a.amount)+'원</a>';}).join(' · ')||'<span class="mini">없음</span>')+'</div>'
+  +'</div></div></div>';}
+function matDetailModal(oid){
+  const o=byId(DB.orders,oid);
+  const receipts=DB.trans.filter(t=>t.type==='purchase'&&DB.pos.some(p=>p.id===t.poId&&p.orderId===oid));
+  const issues=(DB.issues||[]).filter(i=>i.orderId===oid);
+  let rows='';
+  receipts.forEach(t=>{const p=byId(DB.pos,t.poId);
+    t.lines.forEach(l=>{rows+='<tr><td>'+t.date+'</td><td><span class="badge b-blue">직납 입고</span></td><td>'+esc(l.name)+'</td><td class="r num">'+fmt(l.qty)+'</td><td class="r num">'+fmt(l.price)+'</td><td class="r num">'+fmt(l.supply)+'</td><td class="mini">'+(p?p.no:'')+' → '+t.no+'</td></tr>';});});
+  issues.forEach(i=>{rows+='<tr><td>'+i.date+'</td><td><span class="badge b-purple">공용 불출</span></td><td>'+esc(i.name)+'</td><td class="r num">'+fmt(i.qty)+'</td><td class="r num">'+fmt(i.unitCost)+'</td><td class="r num">'+fmt(i.qty*i.unitCost)+'</td><td class="mini">'+esc(i.note||'')+' ('+userName(i.by)+')</td></tr>';});
+  openModal('<h3>자재 투입 내역 — '+o.no+'</h3><div class="mini">견적→발주→입고→(자재)→사용처리로 이어진 이 수주의 자재 이력 전체</div>'
+  +'<table style="margin-top:8px"><tr><th>일자</th><th>경로</th><th>품목</th><th class="r">수량</th><th class="r">단가</th><th class="r">금액</th><th>근거 문서</th></tr>'
+  +(rows||'<tr><td colspan="7" class="mini">투입 내역 없음</td></tr>')
+  +'<tr><td colspan="5" style="text-align:right"><b>자재비 합계</b></td><td class="r num"><b>'+fmt(orderMaterialCost(oid))+'</b></td><td></td></tr></table>'
+  +'<div class="bar" style="margin-top:10px"><button onclick="closeModal()">닫기</button></div>');}
+function instTable(o,ins,locked){
+  return '<table><tr><th style="width:30px">회차</th><th>명칭</th><th>시점</th><th class="r">비율%</th><th class="r">금액(VAT포함)</th><th>예정일</th><th class="r">입금</th><th>상태</th><th></th></tr>'
+  +ins.map(inst=>{const ed=!locked&&inst.status==='planned';const alloc=instAlloc(inst.id);
+    return '<tr><td class="c">'+inst.seq+'</td>'
+    +'<td>'+(ed?'<input style="width:70px" value="'+esc(inst.name)+'" onchange="instChg(\''+inst.id+'\',\'name\',this.value)">':esc(inst.name))+'</td>'
+    +'<td>'+(ed?'<input style="width:80px" value="'+esc(inst.trigger||'')+'" onchange="instChg(\''+inst.id+'\',\'trigger\',this.value)">':esc(inst.trigger||''))+'</td>'
+    +'<td class="r">'+(ed?'<input class="r" style="width:50px" value="'+(inst.ratio||'')+'" onchange="instRatio(\''+inst.id+'\',this.value)">':(inst.ratio||'-'))+'</td>'
+    +'<td class="r">'+(ed?'<input class="r" style="width:110px" value="'+inst.amount+'" onchange="instChg(\''+inst.id+'\',\'amount\',this.value)">':'<span class="num">'+fmt(inst.amount)+'</span>'+(inst.status!=='planned'?' <span class="mini" title="청구/수금 후에는 금액 잠금">🔒</span>':''))+'</td>'
+    +'<td>'+(ed?'<input type="date" value="'+(inst.dueDate||'')+'" onchange="instChg(\''+inst.id+'\',\'dueDate\',this.value)">':(inst.dueDate||''))+'</td>'
+    +'<td class="r num">'+fmt(alloc)+'</td><td>'+badge('inst',inst.status)+(inst.tiId?' <span class="mini">'+((byId(DB.taxInvoices,inst.tiId)||{}).no||'')+'</span>':'')+'</td>'
+    +'<td>'+(inst.status==='planned'&&!locked?'<button class="sm" onclick="issueModal(\'installment\',\''+inst.id+'\')">계산서 발행</button> <button class="sm danger" onclick="instDel(\''+inst.id+'\')">✕</button>':'')+'</td></tr>';}).join('')
+  +'</table>';}
+function instChg(id,k,v){const inst=byId(DB.installments,id);
+  if(inst.status!=='planned'&&(k==='amount')){toast('청구/수금된 회차는 금액을 바꿀 수 없습니다');route();return;}
+  inst[k]=k==='amount'?Math.round(+String(v).replace(/,/g,'')||0):v;
+  if(k==='amount')inst.ratio=null;
+  saveDB();route();}
+function instRatio(id,v){const inst=byId(DB.installments,id);const o=byId(DB.orders,inst.orderId);
+  inst.ratio=+v||0;inst.amount=Math.round(orderTotal(o)*inst.ratio/100);saveDB();route();}
+function instAdd(oid){const o=byId(DB.orders,oid);const ins=orderInsts(oid);
+  const names=['계약금','중도금','잔금'];
+  DB.installments.push({id:uid('in'),orderId:oid,seq:ins.length+1,name:names[Math.min(ins.length,2)],trigger:'',ratio:null,amount:0,dueDate:addDays(today(),30*(ins.length+1)),status:'planned',tiId:null});
+  saveDB();route();}
+function instDel(id){const inst=byId(DB.installments,id);
+  if(inst.status!=='planned'){toast('청구/수금된 회차는 삭제할 수 없습니다');return;}
+  if(!confirm('회차를 삭제할까요?'))return;
+  DB.installments=DB.installments.filter(i=>i.id!==id);
+  orderInsts(inst.orderId).forEach((x,i)=>x.seq=i+1);saveDB();route();}
+function instAutoFill(oid){const o=byId(DB.orders,oid);const ins=orderInsts(oid);
+  const tot=orderTotal(o);const fixed=ins.filter(i=>i.status!=='planned'||i.amount>0);
+  const open=ins.filter(i=>i.status==='planned'&&i.amount===0);
+  if(!open.length){toast('금액이 0원인 예정 회차가 없습니다');return;}
+  const remain=tot-fixed.reduce((s,i)=>s+i.amount,0);
+  const each=Math.floor(remain/open.length);
+  open.forEach((i,idx)=>{i.amount=idx===open.length-1?remain-each*(open.length-1):each;});
+  saveDB();route();toast('잔여 '+fmt(remain)+'원을 자동 배분했습니다');}
+function instPreset(oid){const o=byId(DB.orders,oid);
+  if(orderInsts(oid).length&&!confirm('기존 회차(예정 상태)를 지우고 30/40/30으로 다시 만들까요? 청구·수금된 회차는 유지됩니다.'))return;
+  DB.installments=DB.installments.filter(i=>i.orderId!==oid||i.status!=='planned');
+  const kept=orderInsts(oid);const tot=orderTotal(o);const keptAmt=kept.reduce((s,i)=>s+i.amount,0);
+  const remain=tot-keptAmt;const r=[["계약금","계약 시",30],["중도금","제작 착수",40],["잔금","검수 완료",30]];
+  let acc=0;r.forEach((x,i)=>{let amt=i===2?remain-acc:Math.round(remain*x[2]/100);acc+=amt;
+    DB.installments.push({id:uid('in'),orderId:oid,seq:kept.length+i+1,name:x[0],trigger:x[1],ratio:x[2],amount:amt,dueDate:addDays(today(),30*(i+1)),status:'planned',tiId:null});});
+  saveDB();route();}
+function orderStatus(id,st){const o=byId(DB.orders,id);o.status=st;touch(o);saveDB();route();toast('상태가 변경되었습니다');}
+function orderClose(id){const o=byId(DB.orders,id);const ins=orderInsts(id);
+  const unpaid=ins.filter(i=>i.status!=='paid');
+  if(unpaid.length&&!confirm('미수금 회차가 '+unpaid.length+'건 남아 있습니다. 그래도 종결할까요?\n(종결 후에는 수정이 잠깁니다)'))return;
+  o.status='closed';touch(o);saveDB();route();}
+function orderCancel(id){const o=byId(DB.orders,id);const ins=orderInsts(id);
+  const hasAlloc=ins.some(i=>instAlloc(i.id)>0);
+  const hasSent=DB.taxInvoices.some(ti=>ti.status==='sent'&&((ti.basis==='order'&&ti.basisId===id)||(ti.basis==='installment'&&ins.some(i=>i.id===ti.basisId))));
+  if(hasAlloc){alert('입금 배분이 있는 수주는 바로 취소할 수 없습니다.\n[자금/통장대사]에서 배분을 먼저 취소하세요. (절차 강제)');return;}
+  if(hasSent){alert('발행된 세금계산서가 있는 수주는 바로 취소할 수 없습니다.\n[세금계산서]에서 수정(취소)계산서를 먼저 발행하세요. (절차 강제)');return;}
+  if(!confirm('수주를 취소할까요? 취소 후에는 잠금 상태가 됩니다.'))return;
+  o.status='canceled';touch(o);
+  if(o.quoteId){const q=byId(DB.quotes,o.quoteId);if(q){q.status='sent';q.soId=null;touch(q);}}
+  saveDB();route();toast('수주가 취소되었습니다. 원본 견적은 다시 활성화되었습니다.');}
+function pageOrderEdit(M,id){
+  const isNew=id==='new';
+  const o=isNew?{companyId:null,date:today(),dueDate:addDays(today(),60),memo:'',status:'ordered',midterm:false,lines:[]}:byId(DB.orders,id);
+  if(!o){M.innerHTML='없음';return;}
+  if(!isNew&&['closed','canceled'].includes(o.status)){M.innerHTML='<div class="card">종결/취소된 수주는 수정할 수 없습니다. <a class="lnk" href="#/orders/view/'+id+'">← 돌아가기</a></div>';return;}
+  ED={type:'order',id:isNew?null:o.id,companyId:o.companyId,lines:o.lines.map(l=>({...l})),ro:false};
+  M.innerHTML='<h2>'+(isNew?'수주 직접 등록':'수주 수정 '+o.no)+'</h2><div class="crumb"><a class="lnk" href="'+(isNew?'#/orders':'#/orders/view/'+o.id)+'">← 돌아가기</a></div>'
+  +(!isNew&&o.status!=='ordered'?'<div class="warnbox">제작중/납품 단계의 수주입니다. 금액 변경 시 발행된 계산서·수금계획과 어긋날 수 있어 저장 시 경고합니다.</div>':'')
+  +'<div class="card"><div class="frm">'
+  +'<div><label>거래처 *</label><div class="bar" style="margin:0"><input id="f-co" value="'+esc(o.companyId?co(o.companyId).name:'')+'" disabled style="flex:1"><button onclick="pickCompany(cid=>{ED.companyId=cid;document.getElementById(\'f-co\').value=co(cid).name;},\'sales\')">선택</button></div></div>'
+  +'<div><label>계약일</label><input type="date" id="f-date" value="'+o.date+'"></div>'
+  +'<div><label>납기</label><input type="date" id="f-due" value="'+(o.dueDate||'')+'"></div>'
+  +'<div><label>중간지급조건부 (계약금~잔금 6개월↑)</label><select id="f-mid"><option value="0"'+(o.midterm?'':' selected')+'>아니오</option><option value="1"'+(o.midterm?' selected':'')+'>예 — 회차별 계산서 의무</option></select></div>'
+  +'<div class="full"><label>메모</label><input id="f-memo" value="'+esc(o.memo)+'"></div></div>'
+  +'<h3>품목 라인</h3><div id="ed-lines"></div>'
+  +'<div class="bar" style="margin-top:12px"><button class="pri" onclick="saveOrder()">저장</button><a class="lnk" href="#/orders">취소</a></div></div>';
+  renderEdLines();}
+function saveOrder(){
+  if(!ED.companyId){toast('거래처를 선택하세요');return;}
+  if(!ED.lines.length||ED.lines.every(l=>!l.name)){toast('품목 라인을 입력하세요');return;}
+  const g=x=>document.getElementById(x).value;
+  const data={companyId:ED.companyId,date:g('f-date'),dueDate:g('f-due'),midterm:g('f-mid')==='1',memo:g('f-memo'),lines:ED.lines.filter(l=>l.name)};
+  if(ED.id){const o=byId(DB.orders,ED.id);
+    const oldTot=orderTotal(o);const newTot=lineTotals(data.lines).total;
+    if(oldTot!==newTot){
+      const ins=orderInsts(o.id);
+      const hasBilled=ins.some(i=>i.status!=='planned');
+      if(hasBilled&&!confirm('⚠ 계약액이 '+fmt(oldTot)+' → '+fmt(newTot)+'원으로 바뀝니다.\n이미 청구/수금된 회차가 있습니다. 미청구 회차만 조정 가능합니다. 계속할까요?'))return;
+      if(!hasBilled&&o.status!=='ordered'&&!confirm('제작 진행 중 금액 변경입니다. 계속할까요?'))return;}
+    Object.assign(o,data);touch(o);
+    saveDB();toast('저장되었습니다. 수금계획 합계를 확인하세요.');location.hash='#/orders/view/'+o.id;}
+  else{const o=Object.assign({id:uid('so'),no:docNo('SO',data.date),quoteId:null,status:'ordered'},data);
+    DB.orders.push(o);saveDB();toast('수주가 등록되었습니다. 수금계획을 설정하세요.');location.hash='#/orders/view/'+o.id;}}
+
+/* ---- 4-3. 거래명세서 (납품) ---- */
+function deliveriesList(){
+  const list=DB.trans.filter(t=>t.type==='sales').sort((a,b)=>a.no<b.no?1:-1);
+  return '<div class="card"><div class="bar"><span class="mini">납품은 수주 화면의 [납품 생성] 버튼으로 만듭니다 (라인 복사 + 부분 납품 지원)</span></div>'
+  +'<table><tr><th>명세서번호</th><th>수주</th><th>거래처</th><th>납품일</th><th class="r">공급가액</th><th class="r">합계</th><th>상태</th><th></th></tr>'
+  +list.map(d=>{const t=lineTotals(d.lines);const o=byId(DB.orders,d.orderId);
+    return '<tr><td><a class="lnk" onclick="dlView(\''+d.id+'\')">'+d.no+'</a></td><td>'+(o?'<a class="lnk" href="#/orders/view/'+o.id+'">'+o.no+'</a>':'')+'</td><td>'+esc(co(d.companyId).name)+'</td><td>'+d.date+'</td><td class="r num">'+fmt(t.supply)+'</td><td class="r num"><b>'+fmt(t.total)+'</b></td><td>'+badge('trans',d.status)+'</td>'
+    +'<td>'+(d.status==='open'?'<button class="sm" onclick="issueModal(\'trans\',\''+d.id+'\')">계산서 발행</button> <button class="sm danger" onclick="dlDel(\''+d.id+'\')">삭제</button>':'<span class="mini">수정계산서 필요</span>')+'</td></tr>';}).join('')
+  +'</table></div>';}
+function deliveryModal(oid){
+  const o=byId(DB.orders,oid);const dq=deliveredQty(oid);
+  const rows=o.lines.map((l,i)=>{const k=(l.itemId||'')+'|'+l.name;const rem=l.qty-(dq[k]||0);
+    return {i,l,rem};}).filter(x=>x.rem>0);
+  if(!rows.length){toast('납품 잔량이 없습니다 (전량 납품 완료)');return;}
+  openModal('<h3>납품 생성 — '+o.no+'</h3><div class="mini">수주 라인이 복사됩니다. 수량을 줄이면 부분 납품, 잔량은 자동 추적됩니다.</div>'
+  +'<div class="frm" style="margin:10px 0"><div><label>납품일</label><input type="date" id="dl-date" value="'+today()+'"></div></div>'
+  +'<table><tr><th>품목</th><th class="r">수주수량</th><th class="r">기납품</th><th class="r">잔량</th><th class="r">이번 납품수량</th></tr>'
+  +rows.map(x=>'<tr><td>'+esc(x.l.name)+'</td><td class="r num">'+fmt(x.l.qty)+'</td><td class="r num">'+fmt(x.l.qty-x.rem)+'</td><td class="r num">'+fmt(x.rem)+'</td><td class="r"><input class="r" style="width:80px" id="dl-q'+x.i+'" value="'+x.rem+'"></td></tr>').join('')
+  +'</table><div class="bar" style="margin-top:12px"><button class="pri" onclick="deliveryCreate(\''+oid+'\')">거래명세서 생성</button><button onclick="closeModal()">취소</button></div>');}
+function deliveryCreate(oid){
+  const o=byId(DB.orders,oid);const dq=deliveredQty(oid);
+  const lines=[];let err='';
+  o.lines.forEach((l,i)=>{const el=document.getElementById('dl-q'+i);if(!el)return;
+    const q=+el.value||0;if(q<=0)return;
+    const k=(l.itemId||'')+'|'+l.name;const rem=l.qty-(dq[k]||0);
+    if(q>rem){err='"'+l.name+'" 납품수량('+q+')이 잔량('+rem+')을 초과합니다';return;}
+    const it=l.itemId?byId(DB.items,l.itemId):null;
+    lines.push(calcLine({itemId:l.itemId,name:l.name,spec:l.spec,unit:l.unit,qty:q,price:l.price},it&&it.tax==='exempt'));});
+  if(err){toast('⚠ '+err);return;}
+  if(!lines.length){toast('납품 수량을 입력하세요');return;}
+  const date=document.getElementById('dl-date').value;
+  const d={id:uid('ts'),no:docNo('DL',date),type:'sales',orderId:oid,companyId:o.companyId,date,status:'open',lines};
+  DB.trans.push(d);
+  const dq2=deliveredQty(oid);
+  const full=o.lines.every(l=>{const k=(l.itemId||'')+'|'+l.name;return (dq2[k]||0)>=l.qty;});
+  if(full){o.status='delivered';touch(o);}
+  saveDB();closeModal();route();
+  toast('거래명세서 '+d.no+' 생성'+(full?' · 전량 납품 → 수주 상태 [납품완료]로 자동 변경':''));}
+function dlView(id){const d=byId(DB.trans,id);const o=byId(DB.orders,d.orderId);const t=lineTotals(d.lines);
+  const ti=DB.taxInvoices.find(x=>x.basis==='trans'&&x.basisId===id&&x.status!=='void');
+  openModal('<h3>거래명세서 '+d.no+' '+badge('trans',d.status)+'</h3>'
+  +'<div class="mini">거래처 '+esc(co(d.companyId).name)+' · 납품일 '+d.date+(o?' · 수주 <a class="lnk" href="#/orders/view/'+o.id+'" onclick="closeModal()">'+o.no+'</a>':'')+'</div>'
+  +'<table style="margin-top:8px"><tr><th>품목</th><th>규격</th><th class="r">수량</th><th class="r">단가</th><th class="r">공급가액</th><th class="r">부가세</th></tr>'
+  +d.lines.map(l=>'<tr><td>'+esc(l.name)+'</td><td>'+esc(l.spec||'')+'</td><td class="r num">'+fmt(l.qty)+'</td><td class="r num">'+fmt(l.price)+'</td><td class="r num">'+fmt(l.supply)+'</td><td class="r num">'+fmt(l.vat)+'</td></tr>').join('')
+  +'<tr><td colspan="4" style="text-align:right"><b>합계</b></td><td class="r num"><b>'+fmt(t.supply)+'</b></td><td class="r num"><b>'+fmt(t.vat)+'</b></td></tr></table>'
+  +(ti?'<div class="okbox">세금계산서 '+ti.no+' 발행됨 — 수정은 수정계산서로만 가능합니다.</div>':'')
+  +'<div class="bar" style="margin-top:12px">'+(d.status==='open'?'<button class="pri" onclick="closeModal();issueModal(\'trans\',\''+d.id+'\')">계산서 발행</button>':'')+(d.type==='sales'?'<button onclick="closeModal();emailModal(\'trans\',\''+d.id+'\')">이메일 발송</button>':'')+'<button onclick="closeModal()">닫기</button></div>');}
+function dlDel(id){const d=byId(DB.trans,id);
+  if(d.status!=='open'){toast('계산서가 발행된 명세서는 삭제할 수 없습니다');return;}
+  if(!confirm('거래명세서를 삭제할까요? 납품 잔량이 복구됩니다.'))return;
+  DB.trans=DB.trans.filter(t=>t.id!==id);
+  const o=byId(DB.orders,d.orderId);
+  if(o&&o.status==='delivered'){o.status='producing';touch(o);}
+  saveDB();route();toast('삭제되었습니다 (잔량 복구)');}
+
+/* ---- 4-4. 세금계산서 발행 ---- */
+function issueModal(basis,basisId){
+  let supply=0,vat=0,companyId=null,label='',warn='';
+  if(basis==='order'){const o=byId(DB.orders,basisId);const t=lineTotals(o.lines);supply=t.supply;vat=t.vat;companyId=o.companyId;label='수주 전체 — '+o.no;
+    if(o.midterm)warn='이 수주는 중간지급조건부입니다. 세법상 회차별 발행이 원칙입니다 — 수주 전체 발행이 맞는지 확인하세요.';}
+  else if(basis==='trans'){const d=byId(DB.trans,basisId);const t=lineTotals(d.lines);supply=t.supply;vat=t.vat;companyId=d.companyId;label='납품 — '+d.no;}
+  else{const inst=byId(DB.installments,basisId);const o=byId(DB.orders,inst.orderId);
+    supply=Math.round(inst.amount/1.1);vat=inst.amount-supply;companyId=o.companyId;
+    label='수금 회차 — '+o.no+' '+inst.seq+'회차 '+inst.name+' ('+fmt(inst.amount)+'원, VAT포함 역산)';
+    warn='작성일자는 입금일이 아니라 계약상 지급예정일('+(inst.dueDate||'-')+') 기준이 원칙입니다 (지연발급 가산세 방지).';}
+  const dup=DB.taxInvoices.find(t=>t.basis===basis&&t.basisId===basisId&&t.status!=='void'&&t.supply>0);
+  openModal('<h3>세금계산서 발행</h3><div class="mini">발행 근거: '+label+'</div>'
+  +(dup?'<div class="warnbox">⚠ 이 근거로 이미 발행된 계산서('+dup.no+')가 있습니다. 중복 발행에 주의하세요.</div>':'')
+  +(warn?'<div class="warnbox">'+warn+'</div>':'')
+  +'<div class="frm" style="margin:10px 0">'
+  +'<div><label>작성일자</label><input type="date" id="ti-date" value="'+today()+'"></div>'
+  +'<div><label>공급가액</label><input class="r" id="ti-supply" value="'+supply+'" onchange="document.getElementById(\'ti-vat\').value=Math.round((+this.value.replace(/,/g,\'\')||0)*0.1)"></div>'
+  +'<div><label>세액</label><input class="r" id="ti-vat" value="'+vat+'"></div>'
+  +'<div class="full"><label>비고</label><input id="ti-memo" value=""></div></div>'
+  +'<div class="mini">거래처: '+esc(co(companyId).name)+' · 지금은 내부기록 발행입니다. (추후 홈택스 전송 연동 자리: send_to_hometax)</div>'
+  +'<div class="bar" style="margin-top:12px"><button class="pri" onclick="issueDo(\''+basis+'\',\''+basisId+'\',\''+companyId+'\',\'sent\')">발행 (전송)</button>'
+  +'<button onclick="issueDo(\''+basis+'\',\''+basisId+'\',\''+companyId+'\',\'draft\')">임시저장</button><button onclick="closeModal()">취소</button></div>');}
+function issueDo(basis,basisId,companyId,status){
+  const g=x=>document.getElementById(x).value;
+  const supply=Math.round(+String(g('ti-supply')).replace(/,/g,'')||0);
+  const vat=Math.round(+String(g('ti-vat')).replace(/,/g,'')||0);
+  if(!supply){toast('공급가액을 입력하세요');return;}
+  const ti={id:uid('ti'),no:docNo('TI',g('ti-date')),type:'sales',companyId,date:g('ti-date'),basis,basisId,supply,vat,status,memo:g('ti-memo'),originalId:null,modifyReason:null};
+  DB.taxInvoices.push(ti);
+  if(status==='sent')applyInvoiceEffect(ti);
+  saveDB();closeModal();route();toast('세금계산서 '+ti.no+' '+(status==='sent'?'발행 완료':'임시저장')+' 되었습니다');}
+function applyInvoiceEffect(ti){
+  if(ti.basis==='installment'){const inst=byId(DB.installments,ti.basisId);
+    if(inst){inst.tiId=ti.id;if(inst.status==='planned')inst.status='billed';}}
+  if(ti.basis==='trans'){const d=byId(DB.trans,ti.basisId);if(d)d.status='invoiced';}}
+function invoicesList(type){
+  const f=_stFilter.invoices;
+  const list=DB.taxInvoices.filter(t=>t.type===type&&(!f||t.status===f)).sort((a,b)=>a.no<b.no?1:-1);
+  const all=DB.taxInvoices.filter(t=>t.type===type);
+  const cnt=s=>all.filter(t=>t.status===s).length;
+  return '<div class="card"><div class="bar">'
+  +['','draft','sent'].map(s=>'<a class="lnk" style="'+(f===s?'font-weight:bold':'')+'" onclick="_stFilter.invoices=\''+s+'\';route()">'+(s?ST.ti[s][0]+' '+cnt(s):'전체 '+all.length)+'</a>').join(' · ')
+  +'<div class="sp"></div><span class="mini">'+(type==='sales'?'발행은 수주/납품/회차 화면의 [계산서 발행] 버튼으로 (발행근거 3택1)':'매입 계산서는 입고 내역에서 [계산서 수취]로 등록')+'</span></div>'
+  +'<table><tr><th>번호</th><th>작성일</th><th>거래처</th><th>발행 근거</th><th class="r">공급가액</th><th class="r">세액</th><th class="r">합계</th><th>상태</th><th></th></tr>'
+  +list.map(ti=>{const neg=ti.supply<0;
+    return '<tr'+(neg?' style="color:var(--bad)"':'')+'><td>'+ti.no+(ti.originalId?' <span class="badge b-red" title="수정계산서">수정</span>':'')+'</td><td>'+ti.date+'</td><td>'+esc(co(ti.companyId).name)+'</td><td>'+basisLink(ti)+'</td><td class="r num">'+fmt(ti.supply)+'</td><td class="r num">'+fmt(ti.vat)+'</td><td class="r num"><b>'+fmt(ti.supply+ti.vat)+'</b></td><td>'+badge('ti',ti.status)+(ti.modifyReason?'<div class="mini">'+esc(ti.modifyReason)+'</div>':'')+'</td>'
+    +'<td>'+(ti.status==='draft'?'<button class="sm pri" onclick="tiSend(\''+ti.id+'\')">발행</button> <button class="sm danger" onclick="tiDel(\''+ti.id+'\')">삭제</button>':(ti.supply>0?'<button class="sm" onclick="modifyModal(\''+ti.id+'\')">수정계산서</button>':''))+'</td></tr>';}).join('')
+  +'</table><div class="mini" style="margin-top:6px">발행(전송) 후에는 직접 수정·삭제가 불가능하며 수정세금계산서(6가지 사유)로만 정정합니다.</div></div>';}
+function basisLink(ti){
+  if(ti.basis==='order'){const o=byId(DB.orders,ti.basisId);return o?'수주 <a class="lnk" href="#/orders/view/'+o.id+'">'+o.no+'</a>':'수주';}
+  if(ti.basis==='trans'){const d=byId(DB.trans,ti.basisId);return d?(d.type==='sales'?'납품 ':'입고 ')+'<a class="lnk" onclick="dlView(\''+d.id+'\')">'+d.no+'</a>':'명세서';}
+  if(ti.basis==='installment'){const inst=byId(DB.installments,ti.basisId);if(!inst)return '회차';
+    const o=byId(DB.orders,inst.orderId);return '회차 <a class="lnk" href="#/orders/view/'+o.id+'">'+o.no+' '+inst.seq+'회('+esc(inst.name)+')</a>';}
+  return '-';}
+function tiSend(id){const ti=byId(DB.taxInvoices,id);ti.status='sent';applyInvoiceEffect(ti);saveDB();route();toast(ti.no+' 발행 완료');}
+function tiDel(id){const ti=byId(DB.taxInvoices,id);
+  if(ti.status!=='draft'){toast('발행된 계산서는 삭제 불가 — 수정계산서로 정정하세요');return;}
+  if(!confirm('임시저장 계산서를 삭제할까요?'))return;
+  DB.taxInvoices=DB.taxInvoices.filter(t=>t.id!==id);saveDB();route();}
+const MODIFY_REASONS=[
+  ['기재사항 착오정정','당초분 취소(-) + 정확한 내용으로 재발행(+) 2장 · 작성일자는 당초일 소급',2],
+  ['착오에 의한 이중발급','당초분 취소(-) 1장만 · 작성일자 당초일 소급',1],
+  ['공급가액 변동','증감분만 (+/-) 1장 · 작성일자 = 변동 발생일',3],
+  ['계약의 해제','전액 취소(-) 1장 · 작성일자 = 계약 해제일',1],
+  ['환입 (반품)','반품분만 (-) 1장 · 작성일자 = 환입일',3],
+  ['내국신용장 사후개설','당초분 취소(-) + 영세율(+) 2장 · 작성일자 당초일 소급',2]];
+function modifyModal(tiId){const ti=byId(DB.taxInvoices,tiId);
+  openModal('<h3>수정세금계산서 발행 — 당초분 '+ti.no+'</h3>'
+  +'<div class="mini">당초: '+ti.date+' / 공급가액 '+fmt(ti.supply)+' / 세액 '+fmt(ti.vat)+' — 홈택스 6가지 사유 체계</div>'
+  +'<div class="frm" style="margin:10px 0"><div class="full"><label>수정 사유</label><select id="mr-reason" onchange="mrHint()">'
+  +MODIFY_REASONS.map((r,i)=>'<option value="'+i+'">'+r[0]+'</option>').join('')+'</select></div>'
+  +'<div class="full"><div class="warnbox" id="mr-hint">'+MODIFY_REASONS[0][1]+'</div></div>'
+  +'<div><label>작성일자</label><input type="date" id="mr-date" value="'+ti.date+'"></div>'
+  +'<div id="mr-amt-wrap" style="display:none"><label>변동/환입 공급가액 (음수=감액)</label><input class="r" id="mr-amt" value="0"></div>'
+  +'</div><div class="bar"><button class="pri" onclick="modifyDo(\''+tiId+'\')">수정계산서 발행</button><button onclick="closeModal()">취소</button></div>');}
+function mrHint(){const i=+document.getElementById('mr-reason').value;
+  document.getElementById('mr-hint').textContent=MODIFY_REASONS[i][1];
+  document.getElementById('mr-amt-wrap').style.display=(i===2||i===4)?'block':'none';
+  const ti=null;
+  document.getElementById('mr-date').value=(i===0||i===1||i===5)?document.getElementById('mr-date').value:today();}
+function modifyDo(tiId){
+  const ti=byId(DB.taxInvoices,tiId);
+  const ri=+document.getElementById('mr-reason').value;
+  const reason=MODIFY_REASONS[ri][0];
+  const date=document.getElementById('mr-date').value;
+  let negSupply=-ti.supply,negVat=-ti.vat;
+  if(ri===2||ri===4){const amt=Math.round(+String(document.getElementById('mr-amt').value).replace(/,/g,'')||0);
+    if(!amt){toast('변동/환입 금액을 입력하세요');return;}
+    negSupply=ri===4?-Math.abs(amt):amt;negVat=Math.round(negSupply*0.1);}
+  const neg={id:uid('ti'),no:docNo(ti.type==='sales'?'TI':'PTI',date),type:ti.type,companyId:ti.companyId,date,basis:ti.basis,basisId:ti.basisId,supply:negSupply,vat:negVat,status:'sent',memo:'수정('+reason+') — 당초 '+ti.no,originalId:ti.id,modifyReason:reason};
+  DB.taxInvoices.push(neg);
+  if(MODIFY_REASONS[ri][2]===2){ // 부(-) + 정(+) 2장
+    const pos={id:uid('ti'),no:docNo(ti.type==='sales'?'TI':'PTI',date),type:ti.type,companyId:ti.companyId,date,basis:ti.basis,basisId:ti.basisId,supply:ti.supply,vat:ti.vat,status:'draft',memo:'수정 재발행분(내용 수정 후 발행) — 당초 '+ti.no,originalId:ti.id,modifyReason:reason};
+    DB.taxInvoices.push(pos);}
+  recalcBasisBilling(ti);
+  saveDB();closeModal();route();
+  toast('수정계산서 발행 완료'+(MODIFY_REASONS[ri][2]===2?' · 재발행분은 임시저장으로 생성 — 내용 확인 후 발행하세요':''));}
+function recalcBasisBilling(ti){
+  const sum=DB.taxInvoices.filter(x=>x.basis===ti.basis&&x.basisId===ti.basisId&&x.status==='sent').reduce((s,x)=>s+x.supply+x.vat,0);
+  if(ti.basis==='installment'){const inst=byId(DB.installments,ti.basisId);
+    if(inst&&sum<=0&&inst.status==='billed'){inst.status='planned';inst.tiId=null;}}
+  if(ti.basis==='trans'){const d=byId(DB.trans,ti.basisId);
+    if(d&&sum<=0&&d.status==='invoiced')d.status='open';}}
+
+/* ================= 5. 구매 (발주→입고→매입계산서) ================= */
+function pagePurchase(M,tab){
+  const t=[['pos','발주서',DB.pos.length,'#/purchase'],['ptrans','입고 (매입명세)',DB.trans.filter(x=>x.type==='purchase').length,'#/ptrans'],['stock','자재 재고/사용처리',stockRows().filter(r=>r.qty>0).length,'#/stock'],['pinvoices','세금계산서(매입)',DB.taxInvoices.filter(x=>x.type==='purchase').length,'#/pinvoices']];
+  let body=tab==='pos'?posList():tab==='ptrans'?ptransList():tab==='stock'?stockPage():invoicesList('purchase');
+  M.innerHTML='<h2>구매 (매입)</h2><div class="crumb">발주 → 입고 → (수주 직납=즉시 원가 / 공통=자재 재고) → 사용처리(불출) → 프로젝트 원가</div>'
+  +'<div class="tabs">'+t.map(x=>'<a href="'+x[3]+'"'+(tab===x[0]?' class="on"':'')+'>'+x[1]+' ('+x[2]+')</a>').join('')+'</div>'+body;}
+
+/* ---- v2: 자재 재고 / 사용처리 ---- */
+function stockPage(){
+  const rows=stockRows();
+  const issues=(DB.issues||[]).slice().sort((a,b)=>a.date<b.date?1:-1);
+  return '<div class="card"><h3 style="margin-top:0">자재 재고 <span class="mini">(공통 발주 입고 − 사용처리 · 수주 직납 발주분은 재고를 거치지 않고 바로 그 수주 원가)</span></h3>'
+  +'<table><tr><th>품목</th><th>규격</th><th class="r">입고누계</th><th class="r">사용누계</th><th class="r">현재고</th><th class="r">평균단가</th><th class="r">재고금액</th><th></th></tr>'
+  +(rows.map(r=>'<tr><td><b>'+esc(r.name)+'</b></td><td>'+esc(r.spec||'')+'</td><td class="r num">'+fmt(r.inQty)+'</td><td class="r num">'+fmt(r.outQty)+'</td><td class="r num"'+(r.qty<=0?' style="color:var(--sub)"':'')+'><b>'+fmt(r.qty)+'</b></td><td class="r num">'+fmt(r.avgCost)+'</td><td class="r num">'+fmt(r.qty*r.avgCost)+'</td>'
+    +'<td>'+(r.qty>0?'<button class="sm pri" onclick="mIssueModal(\''+r.key+'\')">사용처리 (불출)</button>':'')+'</td></tr>').join('')||'<tr><td colspan="8" class="mini">공통 발주 입고분이 없습니다. 발주서에서 "연결 안 함(공통)"으로 발주→입고하면 여기 적립됩니다.</td></tr>')
+  +'</table></div>'
+  +'<div class="card"><h3 style="margin-top:0">사용처리(불출) 이력 <span class="mini">— 견적→발주→입고→자재→사용처리 이력 체인의 마지막 단계</span></h3>'
+  +'<table><tr><th>일자</th><th>품목</th><th class="r">수량</th><th class="r">단가(이동평균)</th><th class="r">금액</th><th>투입 대상</th><th>메모</th><th>처리자</th><th></th></tr>'
+  +(issues.map(is=>{const o=is.orderId?byId(DB.orders,is.orderId):null;
+    return '<tr><td>'+is.date+'</td><td>'+esc(is.name)+'</td><td class="r num">'+fmt(is.qty)+'</td><td class="r num">'+fmt(is.unitCost)+'</td><td class="r num"><b>'+fmt(is.qty*is.unitCost)+'</b></td>'
+    +'<td>'+(o?'<a class="lnk" href="#/orders/view/'+o.id+'">'+o.no+'</a> (수주 원가 반영)':'<span class="mini">기타(소모/샘플)</span>')+'</td><td class="mini">'+esc(is.note||'')+'</td><td class="mini">'+userName(is.by)+'</td>'
+    +'<td><button class="sm danger" onclick="issueCancel(\''+is.id+'\')">취소</button></td></tr>';}).join('')||'<tr><td colspan="9" class="mini">이력 없음</td></tr>')
+  +'</table></div>';}
+function mIssueModal(key){
+  const r=stockOf(key);
+  if(!r.qty){toast('재고가 없습니다');return;}
+  const orders=DB.orders.filter(o=>!['closed','canceled'].includes(o.status));
+  openModal('<h3>자재 사용처리 (불출) — '+esc(r.name)+'</h3>'
+  +'<div class="mini">현재고 '+fmt(r.qty)+' · 평균단가 '+fmt(r.avgCost)+'원 — 수주를 선택하면 그 수주의 자재비로 즉시 반영됩니다.</div>'
+  +'<div class="frm" style="margin:10px 0">'
+  +'<div><label>불출일</label><input type="date" id="is-date" value="'+today()+'"></div>'
+  +'<div><label>수량 (최대 '+fmt(r.qty)+')</label><input class="r" id="is-qty" value="1"></div>'
+  +'<div class="full"><label>투입 대상</label><select id="is-order"><option value="">기타 (소모/샘플 — 원가 미반영)</option>'+orders.map(o=>'<option value="'+o.id+'">'+o.no+' · '+esc(co(o.companyId).name)+'</option>').join('')+'</select></div>'
+  +'<div class="full"><label>메모</label><input id="is-note"></div></div>'
+  +'<div class="bar"><button class="pri" onclick="mIssueDo(\''+key+'\')">불출 확정</button><button onclick="closeModal()">취소</button></div>');}
+function mIssueDo(key){
+  const r=stockOf(key);
+  const qty=+String(document.getElementById('is-qty').value).replace(/,/g,'')||0;
+  if(qty<=0){toast('수량을 입력하세요');return;}
+  if(qty>r.qty){toast('⚠ 재고('+fmt(r.qty)+')를 초과해 불출할 수 없습니다');return;}
+  DB.issues=DB.issues||[];
+  DB.issues.push({id:uid('is'),date:document.getElementById('is-date').value,itemId:r.itemId,name:r.name,qty,unitCost:r.avgCost,orderId:document.getElementById('is-order').value||null,note:document.getElementById('is-note').value,by:curUser().id});
+  saveDB();closeModal();route();toast('불출 처리 완료 — 수주 원가에 반영되었습니다');}
+function issueCancel(id){const is=byId(DB.issues,id);
+  if(!confirm('불출을 취소할까요? 재고가 복구되고 수주 원가에서 제외됩니다.'))return;
+  DB.issues=DB.issues.filter(x=>x.id!==id);saveDB();route();toast('불출이 취소되었습니다 (재고 복구)');}
+function posList(){
+  const list=DB.pos.slice().sort((a,b)=>a.no<b.no?1:-1);
+  return '<div class="card"><div class="bar"><span class="mini">공급가 '+fmt(DB.settings.approvalLimit)+'원 초과 발주는 결재 승인 후 입고·메일 가능 (한도 이하 자동승인)</span><div class="sp"></div><button class="pri" onclick="window._poOrder=null;location.hash=\'#/po/edit/new\'">+ 발주서 작성</button></div>'
+  +'<table><tr><th>발주번호</th><th>공급처</th><th>연결 수주</th><th>발주일</th><th class="r">발주액(공급가)</th><th>결재</th><th>입고</th><th>상태</th><th></th></tr>'
+  +list.map(p=>{const t=lineTotals(p.lines);const o=p.orderId?byId(DB.orders,p.orderId):null;
+    const rq=receivedQty(p.id);const totQ=p.lines.reduce((s,l)=>s+l.qty,0);const gotQ=p.lines.reduce((s,l)=>s+Math.min(rq[(l.itemId||'')+'|'+l.name]||0,l.qty),0);
+    const a=apvOf(p);
+    return '<tr><td><a class="lnk" href="#/po/view/'+p.id+'">'+p.no+'</a></td><td>'+esc(co(p.companyId).name)+'</td><td>'+(o?'<a class="lnk" href="#/orders/view/'+o.id+'">'+o.no+'</a>':'<span class="badge b-purple" title="공통 구매 — 입고 시 자재 재고로">공통</span>')+'</td><td>'+p.date+'</td><td class="r num">'+fmt(t.supply)+'</td><td>'+apvBadge(p)+'</td><td class="mini">'+gotQ+'/'+totQ+'</td><td>'+badge('po',p.status)+'</td>'
+    +'<td>'+(['none','rejected'].includes(a.status)?'<button class="sm" onclick="submitApv(\'po\',\''+p.id+'\')">상신</button> ':'')
+    +(poApvOk(p)&&p.status==='ordered'?'<button class="sm" onclick="emailModal(\'po\',\''+p.id+'\')">메일</button> ':'')
+    +(p.status==='ordered'?'<button class="sm pri" onclick="receiveModal(\''+p.id+'\')">입고 처리</button> <button class="sm" onclick="location.hash=\'#/po/edit/'+p.id+'\'">수정</button>':'')+'</td></tr>';}).join('')
+  +'</table></div>';}
+function poFromOrder(oid){window._poOrder=oid;location.hash='#/po/edit/new';}
+function pagePoEdit(M,id){
+  const isNew=id==='new';
+  const p=isNew?{companyId:null,orderId:window._poOrder||null,date:today(),dueDate:addDays(today(),7),memo:'',status:'ordered',lines:[]}:byId(DB.pos,id);
+  if(!p){M.innerHTML='없음';return;}
+  if(!isNew&&p.status!=='ordered'){M.innerHTML='<div class="card">입고 처리된 발주는 수정할 수 없습니다. <a class="lnk" href="#/po/view/'+id+'">← 발주 보기</a></div>';return;}
+  ED={type:'po',id:isNew?null:p.id,companyId:p.companyId,lines:p.lines.map(l=>({...l})),ro:false};
+  const activeOrders=DB.orders.filter(o=>!['closed','canceled'].includes(o.status));
+  M.innerHTML='<h2>'+(isNew?'발주서 작성':'발주서 수정 '+p.no)+'</h2><div class="crumb"><a class="lnk" href="#/purchase">← 발주 목록</a></div>'
+  +'<div class="card"><div class="frm">'
+  +'<div><label>공급처 *</label><div class="bar" style="margin:0"><input id="f-co" value="'+esc(p.companyId?co(p.companyId).name:'')+'" disabled style="flex:1"><button onclick="pickCompany(cid=>{ED.companyId=cid;document.getElementById(\'f-co\').value=co(cid).name;},\'purchase\')">선택</button></div></div>'
+  +'<div><label>어느 수주 제작용? (원가 집계 연결)</label><select id="f-order"><option value="">(재고/공통 — 연결 안 함)</option>'+activeOrders.map(o=>'<option value="'+o.id+'"'+(p.orderId===o.id?' selected':'')+'>'+o.no+' · '+esc(co(o.companyId).name)+'</option>').join('')+'</select></div>'
+  +'<div><label>발주일</label><input type="date" id="f-date" value="'+p.date+'"></div>'
+  +'<div><label>입고예정일</label><input type="date" id="f-due" value="'+(p.dueDate||'')+'"></div>'
+  +'<div class="full"><label>메모</label><input id="f-memo" value="'+esc(p.memo)+'"></div></div>'
+  +'<h3>자재 라인 <span class="mini">(품목 선택 시 매입단가 자동 입력)</span></h3><div id="ed-lines"></div>'
+  +'<div class="bar" style="margin-top:12px"><button class="pri" onclick="savePo()">저장</button><a class="lnk" href="#/purchase">취소</a></div></div>';
+  renderEdLines();}
+function savePo(){
+  if(!ED.companyId){toast('공급처를 선택하세요');return;}
+  if(!ED.lines.length||ED.lines.every(l=>!l.name)){toast('자재 라인을 입력하세요');return;}
+  const g=x=>document.getElementById(x).value;
+  const data={companyId:ED.companyId,orderId:g('f-order')||null,date:g('f-date'),dueDate:g('f-due'),memo:g('f-memo'),lines:ED.lines.filter(l=>l.name)};
+  let p;
+  if(ED.id){p=byId(DB.pos,ED.id);Object.assign(p,data);touch(p);resetApvIfNeeded(p);}
+  else{p=Object.assign({id:uid('po'),no:docNo('PO',data.date),status:'ordered',apv:{status:'none'}},data);DB.pos.push(p);}
+  if(apvOf(p).status==='none'){
+    if(autoApvPo(p))toast('저장 — 공급가 한도 이하로 자동 승인되었습니다');
+    else toast('저장 — 공급가 '+fmt(DB.settings.approvalLimit)+'원 초과: 결재 상신이 필요합니다');}
+  else toast('저장되었습니다');
+  saveDB();location.hash='#/purchase';}
+function pagePoView(M,id){
+  const p=byId(DB.pos,id);if(!p){M.innerHTML='없음';return;}
+  const t=lineTotals(p.lines);const rq=receivedQty(p.id);
+  const o=p.orderId?byId(DB.orders,p.orderId):null;
+  const grs=DB.trans.filter(x=>x.type==='purchase'&&x.poId===p.id);
+  const a=apvOf(p);
+  M.innerHTML='<h2>발주서 '+p.no+' '+badge('po',p.status)+' '+apvBadge(p)+'</h2>'
+  +'<div class="crumb"><a class="lnk" href="#/purchase">← 발주 목록</a> · 공급처 '+esc(co(p.companyId).name)+' · 발주일 '+p.date+(o?' · 수주 <a class="lnk" href="#/orders/view/'+o.id+'">'+o.no+'</a> 제작용':' · 공통 구매(입고 시 자재 재고 적립)')+'</div>'
+  +(a.status==='rejected'?'<div class="warnbox">반려됨: '+esc(a.note||'')+' — 수정 후 재상신하세요.</div>':'')
+  +(!poApvOk(p)&&p.status==='ordered'?'<div class="warnbox">결재 승인 전에는 입고 처리·이메일 발송이 잠깁니다.</div>':'')
+  +'<div class="bar">'
+  +(['none','rejected'].includes(a.status)?'<button class="pri" onclick="submitApv(\'po\',\''+p.id+'\')">결재 상신</button>':'')
+  +(a.status==='pending'&&isApprover()?'<button class="pri" onclick="decideApv(\'po\',\''+p.id+'\',true)">승인</button><button class="danger" onclick="decideApv(\'po\',\''+p.id+'\',false)">반려</button>':'')
+  +(poApvOk(p)?'<button onclick="emailModal(\'po\',\''+p.id+'\')">이메일 발송</button>':'')
+  +(p.status==='ordered'?(poApvOk(p)?'<button class="pri" onclick="receiveModal(\''+p.id+'\')">입고 처리</button>':'')+'<button onclick="location.hash=\'#/po/edit/'+p.id+'\'">수정</button>':'<span class="mini">입고 완료된 발주입니다.</span>')+'</div>'
+  +'<div class="card"><table><tr><th>품목</th><th>규격</th><th class="r">발주수량</th><th class="r">단가</th><th class="r">공급가액</th><th class="r">입고됨</th><th class="r">잔량</th></tr>'
+  +p.lines.map(l=>{const k=(l.itemId||'')+'|'+l.name;const r=rq[k]||0;
+    return '<tr><td>'+esc(l.name)+'</td><td>'+esc(l.spec||'')+'</td><td class="r num">'+fmt(l.qty)+'</td><td class="r num">'+fmt(l.price)+'</td><td class="r num">'+fmt(l.supply)+'</td><td class="r num">'+fmt(r)+'</td><td class="r num">'+fmt(l.qty-r)+'</td></tr>';}).join('')
+  +'<tr><td colspan="4" style="text-align:right"><b>합계</b></td><td class="r num"><b>'+fmt(t.supply)+'</b></td><td colspan="2"></td></tr></table></div>'
+  +'<div class="linkpanel"><b>연결 문서</b>'
+  +'<div class="row">입고(매입명세): '+(grs.map(g=>'<a class="lnk" onclick="dlView(\''+g.id+'\')">'+g.no+'</a> '+badge('trans',g.status)).join(' · ')||'<span class="mini">없음</span>')+'</div>'
+  +'<div class="row">연결 수주: '+(o?'<a class="lnk" href="#/orders/view/'+o.id+'">'+o.no+'</a> (자재비로 집계됨)':'<span class="mini">없음 (재고/공통)</span>')+'</div></div>';}
+function receiveModal(pid){
+  const p=byId(DB.pos,pid);const rq=receivedQty(pid);
+  if(!poApvOk(p)){toast('⚠ 결재 승인 전에는 입고 처리할 수 없습니다 ('+(apvOf(p).status==='pending'?'결재중':'미상신/반려')+')');return;}
+  const rows=p.lines.map((l,i)=>{const k=(l.itemId||'')+'|'+l.name;return {i,l,rem:l.qty-(rq[k]||0)};}).filter(x=>x.rem>0);
+  if(!rows.length){toast('입고 잔량이 없습니다');return;}
+  openModal('<h3>입고 처리 — '+p.no+'</h3><div class="mini">매입 거래명세서가 자동 생성됩니다. 부분 입고 가능.</div>'
+  +'<div class="frm" style="margin:10px 0"><div><label>입고일</label><input type="date" id="gr-date" value="'+today()+'"></div></div>'
+  +'<table><tr><th>품목</th><th class="r">발주수량</th><th class="r">기입고</th><th class="r">잔량</th><th class="r">이번 입고수량</th></tr>'
+  +rows.map(x=>'<tr><td>'+esc(x.l.name)+'</td><td class="r num">'+fmt(x.l.qty)+'</td><td class="r num">'+fmt(x.l.qty-x.rem)+'</td><td class="r num">'+fmt(x.rem)+'</td><td class="r"><input class="r" style="width:80px" id="gr-q'+x.i+'" value="'+x.rem+'"></td></tr>').join('')
+  +'</table><div class="bar" style="margin-top:12px"><button class="pri" onclick="receiveDo(\''+pid+'\')">입고 확정</button><button onclick="closeModal()">취소</button></div>');}
+function receiveDo(pid){
+  const p=byId(DB.pos,pid);const rq=receivedQty(pid);
+  if(!poApvOk(p)){toast('⚠ 결재 승인 전에는 입고 처리할 수 없습니다');return;}
+  const lines=[];let err='';
+  p.lines.forEach((l,i)=>{const el=document.getElementById('gr-q'+i);if(!el)return;
+    const q=+el.value||0;if(q<=0)return;
+    const k=(l.itemId||'')+'|'+l.name;const rem=l.qty-(rq[k]||0);
+    if(q>rem){err='"'+l.name+'" 입고수량이 잔량을 초과합니다';return;}
+    const it=l.itemId?byId(DB.items,l.itemId):null;
+    lines.push(calcLine({itemId:l.itemId,name:l.name,spec:l.spec,unit:l.unit,qty:q,price:l.price},it&&it.tax==='exempt'));});
+  if(err){toast('⚠ '+err);return;}
+  if(!lines.length){toast('입고 수량을 입력하세요');return;}
+  const date=document.getElementById('gr-date').value;
+  const g={id:uid('tp'),no:docNo('GR',date),type:'purchase',poId:pid,companyId:p.companyId,date,status:'open',lines};
+  DB.trans.push(g);
+  const rq2=receivedQty(pid);
+  const full=p.lines.every(l=>{const k=(l.itemId||'')+'|'+l.name;return (rq2[k]||0)>=l.qty;});
+  if(full){p.status='received';touch(p);}
+  saveDB();closeModal();route();toast('입고 '+g.no+' 처리'+(full?' · 전량 입고 완료':' (부분 입고)')+(p.orderId?' · 연결 수주 자재비에 반영됨':''));}
+function ptransList(){
+  const list=DB.trans.filter(t=>t.type==='purchase').sort((a,b)=>a.no<b.no?1:-1);
+  return '<div class="card"><div class="bar"><span class="mini">입고는 발주서의 [입고 처리]로 생성됩니다. 계산서 수취 → 미지급금 발생 → 통장 출금과 대사</span></div>'
+  +'<table><tr><th>입고번호</th><th>발주</th><th>공급처</th><th>입고일</th><th class="r">공급가액</th><th class="r">합계</th><th>계산서</th><th class="r">지급/미지급</th><th></th></tr>'
+  +list.map(d=>{const t=lineTotals(d.lines);const p=byId(DB.pos,d.poId);
+    const ti=DB.taxInvoices.find(x=>x.basis==='trans'&&x.basisId===d.id&&x.status==='sent');
+    const paid=ptransAlloc(d.id);const due=ti?ti.supply+ti.vat:t.total;
+    return '<tr><td><a class="lnk" onclick="dlView(\''+d.id+'\')">'+d.no+'</a></td><td>'+(p?'<a class="lnk" href="#/po/view/'+p.id+'">'+p.no+'</a>':'')+'</td><td>'+esc(co(d.companyId).name)+'</td><td>'+d.date+'</td><td class="r num">'+fmt(t.supply)+'</td><td class="r num">'+fmt(t.total)+'</td>'
+    +'<td>'+(ti?'<span class="badge b-green">'+ti.no+'</span>':'<span class="badge b-amber">미수취</span>')+'</td>'
+    +'<td class="r num">'+fmt(paid)+' / '+(due-paid>0?'<span style="color:var(--bad)">'+fmt(due-paid)+'</span>':'<span style="color:var(--ok)">0</span>')+'</td>'
+    +'<td>'+(!ti?'<button class="sm pri" onclick="pInvModal(\''+d.id+'\')">계산서 수취</button>':'')+'</td></tr>';}).join('')
+  +'</table></div>';}
+function pInvModal(tid){const d=byId(DB.trans,tid);const t=lineTotals(d.lines);
+  openModal('<h3>매입 세금계산서 수취 등록 — '+d.no+'</h3><div class="mini">공급처 '+esc(co(d.companyId).name)+'에게 받은 계산서를 등록합니다 → 미지급금 발생</div>'
+  +'<div class="frm" style="margin:10px 0"><div><label>작성일자</label><input type="date" id="ti-date" value="'+today()+'"></div>'
+  +'<div><label>공급가액</label><input class="r" id="ti-supply" value="'+t.supply+'"></div>'
+  +'<div><label>세액</label><input class="r" id="ti-vat" value="'+t.vat+'"></div>'
+  +'<div class="full"><label>비고</label><input id="ti-memo"></div></div>'
+  +'<div class="bar"><button class="pri" onclick="pInvDo(\''+tid+'\')">수취 등록</button><button onclick="closeModal()">취소</button></div>');}
+function pInvDo(tid){const d=byId(DB.trans,tid);
+  const g=x=>document.getElementById(x).value;
+  const ti={id:uid('ti'),no:docNo('PTI',g('ti-date')),type:'purchase',companyId:d.companyId,date:g('ti-date'),basis:'trans',basisId:tid,supply:Math.round(+String(g('ti-supply')).replace(/,/g,'')||0),vat:Math.round(+String(g('ti-vat')).replace(/,/g,'')||0),status:'sent',memo:g('ti-memo'),originalId:null,modifyReason:null};
+  DB.taxInvoices.push(ti);d.status='invoiced';
+  saveDB();closeModal();route();toast('매입계산서 등록 — 미지급금에 반영되었습니다');}
+
+/* ================= 6. 자금 / 통장 대사 ================= */
+function pageMoney(M,sub){
+  const t=[['status','수금 현황','#/money/status'],['bank','통장 내역 / 대사','#/money/bank']];
+  let body=sub==='bank'?bankList():moneyStatus();
+  M.innerHTML='<h2>자금 / 통장 대사</h2><div class="crumb">통장 원본은 수정 불가 · 배분(대사)만 취소/재배분 · 미수금 = Σ수금계획 − Σ배분입금</div>'
+  +'<div class="tabs">'+t.map(x=>'<a href="'+x[2]+'"'+(sub===x[0]?' class="on"':'')+'>'+x[1]+'</a>').join('')+'</div>'+body;}
+function moneyStatus(){
+  const orders=DB.orders.filter(o=>o.status!=='canceled');
+  const rows=orders.map(o=>{const ins=orderInsts(o.id);
+    const plan=ins.reduce((s,i)=>s+i.amount,0);const paid=ins.reduce((s,i)=>s+instAlloc(i.id),0);
+    const overdue=ins.filter(i=>i.status!=='paid'&&i.dueDate&&i.dueDate<today());
+    let age=0;overdue.forEach(i=>{const m=Math.floor((new Date(today())-new Date(i.dueDate))/2592000000);if(m>age)age=m;});
+    return {o,plan,paid,recv:plan-paid,age,overdue:overdue.length};}).filter(r=>r.plan>0);
+  const tot=rows.reduce((a,r)=>({p:a.p+r.plan,d:a.d+r.paid,r:a.r+r.recv}),{p:0,d:0,r:0});
+  return '<div class="card"><h3 style="margin-top:0">수주별 수금 현황 (회수예정표)</h3>'
+  +'<table><tr><th>수주</th><th>거래처</th><th class="r">수금계획</th><th class="r">입금</th><th class="r">미수</th><th class="c">연체회차</th><th class="c">최장경과</th><th></th></tr>'
+  +rows.map(r=>'<tr><td><a class="lnk" href="#/orders/view/'+r.o.id+'">'+r.o.no+'</a></td><td><a class="lnk" href="#/reports/ledger?c='+r.o.companyId+'">'+esc(co(r.o.companyId).name)+'</a></td><td class="r num">'+fmt(r.plan)+'</td><td class="r num" style="color:var(--ok)">'+fmt(r.paid)+'</td><td class="r num"'+(r.recv>0?' style="color:var(--bad);font-weight:bold"':'')+'>'+fmt(r.recv)+'</td>'
+    +'<td class="c">'+(r.overdue?'<span class="badge b-red">'+r.overdue+'건</span>':'-')+'</td><td class="c">'+(r.age?r.age+'개월':'-')+'</td>'
+    +'<td><div class="gaugewrap" style="width:110px"><div class="gauge" style="width:'+(r.plan?Math.round(r.paid/r.plan*100):0)+'%;background:var(--ok)"></div></div></td></tr>').join('')
+  +'<tr><td colspan="2"><b>합계</b></td><td class="r num"><b>'+fmt(tot.p)+'</b></td><td class="r num"><b>'+fmt(tot.d)+'</b></td><td class="r num" style="color:var(--bad)"><b>'+fmt(tot.r)+'</b></td><td colspan="3"></td></tr></table></div>';}
+function bankFilterState(){window._bkF=window._bkF||'';return window._bkF;}
+function bankList(){
+  const f=bankFilterState();
+  const list=DB.bank.slice().sort((a,b)=>a.date<b.date?1:-1);
+  const shown=list.filter(b=>{const s=bankStatus(b);return !f||s===f;});
+  const cnt=s=>list.filter(b=>bankStatus(b)===s).length;
+  return '<div class="card"><div class="bar">'
+  +[['','전체 '+list.length],['unmatched','미대사 '+cnt('unmatched')],['partial','부분 '+cnt('partial')],['matched','완료 '+cnt('matched')],['etc','기타 '+cnt('etc')]].map(x=>'<a class="lnk" style="'+(f===x[0]?'font-weight:bold':'')+'" onclick="window._bkF=\''+x[0]+'\';route()">'+x[1]+'</a>').join(' · ')
+  +'<div class="sp"></div><button onclick="csvModal()">CSV 업로드 / 붙여넣기</button></div>'
+  +'<table><tr><th>거래일</th><th>적요(입금자)</th><th class="r">입금</th><th class="r">출금</th><th class="r">배분됨</th><th class="r">잔여</th><th>상태</th><th>배분 내역</th><th></th></tr>'
+  +shown.map(b=>{const s=bankStatus(b);const al=bankAllocated(b.id);const rem=bankRemain(b);
+    const allocs=DB.allocs.filter(a=>a.bankId===b.id);
+    return '<tr><td>'+b.date+'</td><td>'+esc(b.desc)+'</td><td class="r num" style="color:var(--pri)">'+(b.amount>0?fmt(b.amount):'')+'</td><td class="r num" style="color:var(--bad)">'+(b.amount<0?fmt(-b.amount):'')+'</td><td class="r num">'+fmt(al)+'</td><td class="r num">'+fmt(rem)+'</td><td>'+badge('bank',s)+'</td>'
+    +'<td class="mini">'+allocs.map(a=>allocLabel(a)+' <a class="lnk" onclick="allocCancel(\''+a.id+'\')">[취소]</a>').join('<br>')+(b.status==='etc'?esc(b.etcNote||'기타'):'')+'</td>'
+    +'<td>'+(s!=='matched'&&b.status!=='etc'&&rem>0?'<button class="sm pri" onclick="reconModal(\''+b.id+'\')">배분</button> ':'')
+    +(b.status!=='etc'&&al===0?'<button class="sm" onclick="bankEtc(\''+b.id+'\')">기타</button>':'')
+    +(b.status==='etc'?'<button class="sm" onclick="bankEtcUndo(\''+b.id+'\')">기타 해제</button>':'')+'</td></tr>';}).join('')
+  +'</table><div class="mini" style="margin-top:6px">통장 원본 행은 수정·삭제할 수 없습니다. "기타" = 급여·경비·이자 등 매출/매입과 무관한 건.</div></div>';}
+function allocLabel(a){
+  if(a.targetType==='installment'){const i=byId(DB.installments,a.targetId);if(!i)return '';const o=byId(DB.orders,i.orderId);
+    return '→ '+(o?o.no:'')+' '+i.seq+'회('+esc(i.name)+') '+fmt(a.amount)+'원'+(a.fee?' +수수료'+fmt(a.fee):'');}
+  if(a.targetType==='purchaseTrans'){const d=byId(DB.trans,a.targetId);return '→ 매입 '+(d?d.no:'')+' '+fmt(a.amount)+'원';}
+  return '→ 수수료/잡이익 '+fmt(a.amount)+'원';}
+function bankEtc(id){const b=byId(DB.bank,id);const note=prompt('기타 처리 사유 (예: 급여, 경비, 이자, 대표자 가수금)','경비');
+  if(note===null)return;b.status='etc';b.etcNote=note;saveDB();route();}
+function bankEtcUndo(id){const b=byId(DB.bank,id);b.status='unmatched';b.etcNote='';saveDB();route();}
+function normName(s){return String(s||'').replace(/[\s\(\)（）주식회사㈜\(주\)]/g,'').toLowerCase();}
+function nameScore(desc,c){const d=normName(desc);if(!d)return 0;
+  const cands=[c.name].concat(c.aliases||[]);
+  for(const n of cands){const nn=normName(n);if(!nn)continue;
+    if(d.includes(nn)||nn.includes(d))return 30;
+    if(nn.length>=2&&d.includes(nn.slice(0,2)))return 15;}
+  return 0;}
+function reconModal(bid){
+  const b=byId(DB.bank,bid);const rem=bankRemain(b);
+  let cands=[];
+  if(b.amount>0){
+    DB.installments.forEach(i=>{const o=byId(DB.orders,i.orderId);
+      if(!o||o.status==='canceled'||i.status==='paid')return;
+      const irem=instRemain(i);if(irem<=0)return;
+      const c=co(o.companyId);let sc=0;
+      sc+=irem===rem?45:(rem<=irem?25:10);
+      sc+=nameScore(b.desc,c);
+      if(i.dueDate){const dd=Math.abs((new Date(b.date)-new Date(i.dueDate))/86400000);sc+=dd<=3?20:dd<=14?12:dd<=31?6:0;}
+      cands.push({type:'installment',id:i.id,sc,title:o.no+' '+i.seq+'회 '+i.name+' · '+c.name,due:i.dueDate,remain:irem});});
+  }else{
+    DB.taxInvoices.filter(t=>t.type==='purchase'&&t.status==='sent').forEach(ti=>{
+      const unpaid=ti.supply+ti.vat-ptransAlloc(ti.basisId);if(unpaid<=0)return;
+      const c=co(ti.companyId);let sc=0;
+      sc+=unpaid===rem?45:(rem<=unpaid?25:10);
+      sc+=nameScore(b.desc,c);
+      const dd=Math.abs((new Date(b.date)-new Date(ti.date))/86400000);sc+=dd<=7?15:dd<=31?8:0;
+      cands.push({type:'purchaseTrans',id:ti.basisId,sc,title:'매입 '+ti.no+' · '+c.name,due:ti.date,remain:unpaid});});}
+  cands.sort((a,b2)=>b2.sc-a.sc);cands=cands.slice(0,8);
+  window._reconBid=bid;window._reconCands=cands;
+  openModal('<h3>'+(b.amount>0?'입금':'출금')+' 배분 — '+b.date+' '+esc(b.desc)+' <span class="num" style="color:'+(b.amount>0?'var(--pri)':'var(--bad)')+'">'+fmt(Math.abs(b.amount))+'원</span></h3>'
+  +'<div class="mini">배분 가능 잔액: <b class="num">'+fmt(rem)+'원</b> · 자동 추천순 정렬 (금액일치 &gt; 이름유사 &gt; 예정일근접). 여러 건에 나눠 배분(분할)할 수 있습니다.</div>'
+  +(cands.length?'<table style="margin-top:8px"><tr><th>추천</th><th>대상</th><th>예정/작성일</th><th class="r">미수/미지급 잔액</th><th class="r">배분액 입력</th></tr>'
+  +cands.map((cd,i)=>'<tr'+(i===0&&cd.sc>=60?' style="background:#eff6ff"':'')+'><td>'+(cd.sc>=60?'<span class="badge b-blue">추천 '+cd.sc+'</span>':'<span class="mini">'+cd.sc+'점</span>')+'</td><td>'+esc(cd.title)+'</td><td>'+(cd.due||'')+'</td><td class="r num">'+fmt(cd.remain)+'</td>'
+    +'<td class="r"><input class="r" style="width:110px" id="rc-'+i+'" value="'+(i===0&&cd.sc>=60?Math.min(cd.remain,rem):0)+'"></td></tr>').join('')+'</table>'
+    :'<div class="warnbox">매칭 후보가 없습니다. '+(b.amount>0?'수금계획이 설정된 수주가 있는지':'미지급 매입계산서가 있는지')+' 확인하거나 [기타]로 처리하세요.</div>')
+  +'<div class="bar" style="margin-top:10px"><label class="mini"><input type="checkbox" id="rc-fee"> 배분 후 남는 소액 잔여를 수수료/잡이익으로 털기 (송금수수료 차액 등)</label></div>'
+  +'<div class="bar" style="margin-top:8px"><button class="pri" onclick="reconDo()">배분 확정</button><button onclick="closeModal()">취소</button></div>');}
+function reconDo(){
+  const bid=window._reconBid;const b=byId(DB.bank,bid);
+  const cands=window._reconCands;let rem=bankRemain(b);
+  let total=0;const picks=[];
+  cands.forEach((cd,i)=>{const v=Math.round(+String((document.getElementById('rc-'+i)||{}).value||'0').replace(/,/g,''))||0;
+    if(v>0)picks.push({cd,v});total+=v>0?v:0;});
+  if(!picks.length){toast('배분액을 입력하세요');return;}
+  if(total>rem){toast('⚠ 배분 합계('+fmt(total)+')가 잔여('+fmt(rem)+')를 초과합니다');return;}
+  for(const p of picks){
+    if(p.v>p.cd.remain){toast('⚠ "'+p.cd.title+'" 배분액이 잔액을 초과합니다');return;}}
+  picks.forEach(p=>{
+    DB.allocs.push({id:uid('a'),bankId:bid,targetType:p.cd.type,targetId:p.cd.id,amount:p.v,fee:0,date:b.date});
+    if(p.cd.type==='installment'){const inst=byId(DB.installments,p.cd.id);refreshInstStatus(inst);
+      const o=byId(DB.orders,inst.orderId);const c=co(o.companyId);
+      if(nameScore(b.desc,c)===0&&b.desc){c.aliases=c.aliases||[];if(!c.aliases.includes(b.desc.trim())){c.aliases.push(b.desc.trim());toast('입금자명 "'+b.desc+'"을(를) '+c.name+' 별칭으로 학습했습니다');}}}});
+  const left=bankRemain(b);
+  if(left>0&&document.getElementById('rc-fee').checked){
+    DB.allocs.push({id:uid('a'),bankId:bid,targetType:'fee',targetId:null,amount:left,fee:0,date:b.date});}
+  saveDB();closeModal();route();toast('배분 완료 (부분입금·분할배분 자동 반영)');}
+function allocCancel(id){const a=byId(DB.allocs,id);
+  if(!confirm('이 배분을 취소할까요? (통장 원본은 그대로, 배분만 취소)'))return;
+  DB.allocs=DB.allocs.filter(x=>x.id!==id);
+  if(a.targetType==='installment'){const inst=byId(DB.installments,a.targetId);if(inst)refreshInstStatus(inst);}
+  saveDB();route();toast('배분이 취소되었습니다');}
+function csvModal(){
+  openModal('<h3>통장 거래내역 가져오기</h3>'
+  +'<div class="mini">형식: <span class="kbd">날짜,적요,입금액,출금액</span> (은행 CSV에서 해당 열 복사). 첫 줄이 제목이면 자동 건너뜀. 같은 내역 재업로드는 중복 감지로 자동 제외됩니다.</div>'
+  +'<div style="margin:10px 0"><input type="file" accept=".csv,.txt" onchange="csvFile(this)"></div>'
+  +'<textarea id="csv-text" rows="8" style="width:100%" placeholder="2026-07-02,(주)대한정밀,15510000,0&#10;2026-07-03,전기요금,0,182300"></textarea>'
+  +'<div class="bar" style="margin-top:10px"><button class="pri" onclick="csvImport()">가져오기</button><button onclick="closeModal()">취소</button></div>');}
+function csvFile(inp){const f=inp.files[0];if(!f)return;
+  const r=new FileReader();r.onload=e=>{document.getElementById('csv-text').value=e.target.result;};r.readAsText(f,'utf-8');}
+function csvImport(){
+  const txt=document.getElementById('csv-text').value.trim();
+  if(!txt){toast('내용이 없습니다');return;}
+  let ok=0,dup=0,bad=0;
+  txt.split(/\r?\n/).forEach(line=>{
+    if(!line.trim())return;
+    const cells=line.split(',').map(s=>s.trim().replace(/^"|"$/g,''));
+    if(cells.length<3){bad++;return;}
+    let date=cells[0].replace(/[.\/]/g,'-');
+    if(!/^\d{4}-\d{1,2}-\d{1,2}/.test(date)){bad++;return;}
+    date=date.slice(0,10);
+    const desc=cells[1];
+    const inAmt=Math.round(+String(cells[2]||'0').replace(/[^0-9.-]/g,''))||0;
+    const outAmt=Math.round(+String(cells[3]||'0').replace(/[^0-9.-]/g,''))||0;
+    const amount=inAmt>0?inAmt:-outAmt;
+    if(!amount){bad++;return;}
+    const hash=date+'|'+desc+'|'+amount;
+    if(DB.bank.some(b=>b.hash===hash)){dup++;return;}
+    DB.bank.push({id:uid('b'),date,desc,amount,balance:null,hash,status:'unmatched',etcNote:''});ok++;});
+  saveDB();closeModal();route();
+  toast('가져오기: '+ok+'건 추가 · 중복 '+dup+'건 제외 · 형식오류 '+bad+'건');}
+
+/* ================= v2. 결재함 ================= */
+function apvRowInfo(x){
+  const t=lineTotals(x.d.lines);
+  const label=x.type==='quote'?'견적서':'발주서';
+  const target=x.type==='quote'?'#/quotes/edit/'+x.d.id:'#/po/view/'+x.d.id;
+  return {label,target,amt:x.type==='quote'?t.total:t.supply,co:co(x.d.companyId).name};}
+function pageApprovals(M){
+  const pend=pendingApvList();
+  const mine=[];
+  DB.quotes.forEach(q=>{const a=apvOf(q);if(a.status!=='none'&&a.reqBy===curUser().id)mine.push({type:'quote',d:q});});
+  DB.pos.forEach(p=>{const a=apvOf(p);if(a.status!=='none'&&a.reqBy===curUser().id)mine.push({type:'po',d:p});});
+  M.innerHTML='<h2>결재함</h2><div class="crumb">현재 사용자: <b>'+esc(curUser().name)+'</b>'+(isApprover()?' (승인 권한)':' (상신만 가능 — 좌측에서 사용자 전환)')+' · 승인 전에는 다음 단계(발송·전환·입고)가 잠깁니다</div>'
+  +'<div class="card"><h3 style="margin-top:0">내가 승인할 문서 ('+pend.length+')</h3>'
+  +'<table><tr><th>문서</th><th>번호</th><th>거래처</th><th class="r">금액</th><th>상신자</th><th>상신일</th><th></th></tr>'
+  +(pend.map(x=>{const i=apvRowInfo(x);const a=apvOf(x.d);
+    return '<tr><td>'+i.label+'</td><td><a class="lnk" href="'+i.target+'">'+x.d.no+'</a></td><td>'+esc(i.co)+'</td><td class="r num"><b>'+fmt(i.amt)+'</b></td><td>'+userName(a.reqBy)+'</td><td>'+(a.reqAt||'')+'</td>'
+    +'<td><button class="sm pri" onclick="decideApv(\''+x.type+'\',\''+x.d.id+'\',true)">승인</button> <button class="sm danger" onclick="decideApv(\''+x.type+'\',\''+x.d.id+'\',false)">반려</button></td></tr>';}).join('')||'<tr><td colspan="7" class="mini">승인 대기 문서가 없습니다</td></tr>')
+  +'</table></div>'
+  +'<div class="card"><h3 style="margin-top:0">내가 올린 문서 (상태 추적)</h3>'
+  +'<table><tr><th>문서</th><th>번호</th><th class="r">금액</th><th>결재 상태</th><th>처리자/일자</th><th>의견</th></tr>'
+  +(mine.map(x=>{const i=apvRowInfo(x);const a=apvOf(x.d);
+    return '<tr><td>'+i.label+'</td><td><a class="lnk" href="'+i.target+'">'+x.d.no+'</a></td><td class="r num">'+fmt(i.amt)+'</td><td>'+apvBadge(x.d)+'</td><td class="mini">'+(a.decBy?userName(a.decBy)+' / '+(a.decAt||''):'-')+'</td><td class="mini">'+esc(a.note||'')+'</td></tr>';}).join('')||'<tr><td colspan="6" class="mini">상신한 문서가 없습니다</td></tr>')
+  +'</table></div>'
+  +'<div class="card"><h3 style="margin-top:0">결재 설정</h3><div class="frm">'
+  +'<div><label>발주 자동승인 한도 (공급가액, 원) — 초과 시 결재 필수</label><input class="r" id="set-limit" value="'+DB.settings.approvalLimit+'" '+(isApprover()?'':'disabled')+'></div>'
+  +'<div><label>견적서 결재 필수</label><select id="set-qapv" '+(isApprover()?'':'disabled')+'><option value="1"'+(DB.settings.quoteApproval?' selected':'')+'>예 — 승인 후 발송/전환</option><option value="0"'+(DB.settings.quoteApproval?'':' selected')+'>아니오 — 결재 생략</option></select></div>'
+  +'</div><div class="bar" style="margin-top:10px">'+(isApprover()?'<button class="pri" onclick="saveApvSettings()">설정 저장</button>':'<span class="mini">설정은 승인 권한자만 변경할 수 있습니다</span>')+'</div>'
+  +'<div class="mini" style="margin-top:6px">설계 근거: 전건 결재 대신 "금액 한도 초과분만 승인"(Monitor·Odoo 패턴) + "승인 전 다음 단계 차단"(영림원 게이트). 메신저(알림톡) 카드 승인은 v3 후보.</div></div>';}
+function saveApvSettings(){
+  DB.settings.approvalLimit=Math.round(+String(document.getElementById('set-limit').value).replace(/,/g,'')||0);
+  DB.settings.quoteApproval=document.getElementById('set-qapv').value==='1';
+  saveDB();route();toast('결재 설정이 저장되었습니다');}
+
+/* ================= 7. 조회 / 장부 (읽기 전용) ================= */
+function pageReports(M,sub){
+  const [tab,qs]=String(sub||'ledger').split('?');
+  const params={};(qs||'').split('&').forEach(kv=>{const[k,v]=kv.split('=');if(k)params[k]=v;});
+  const t=[['ledger','거래처 원장'],['profit','수주별 손익'],['plan','수금계획 현황'],['history','매출·매입 이력'],['tis','세금계산서 목록'],['payable','미지급 현황']];
+  let body='';
+  if(tab==='ledger')body=repLedger(params);
+  else if(tab==='profit')body=repProfit();
+  else if(tab==='plan')body=repPlan();
+  else if(tab==='history')body=repHistory();
+  else if(tab==='tis')body=repTis();
+  else body=repPayable();
+  M.innerHTML='<h2>조회 / 장부</h2><div class="crumb">읽기 전용 · 각 행에서 원본 문서로 드릴다운됩니다</div>'
+  +'<div class="tabs">'+t.map(x=>'<a href="#/reports/'+x[0]+'"'+(tab===x[0]?' class="on"':'')+'>'+x[1]+'</a>').join('')+'</div>'+body;}
+function repLedger(params){
+  const cid=params.c||window._ledgerC||(DB.companies.find(c=>c.type!=='purchase')||{}).id;
+  window._ledgerC=cid;
+  const from=window._ledgerFrom||today().slice(0,4)+'-01-01';
+  const to=window._ledgerTo||today();
+  const sel='<div class="bar"><select onchange="window._ledgerC=this.value;route()">'+DB.companies.map(c=>'<option value="'+c.id+'"'+(c.id===cid?' selected':'')+'>'+esc(c.name)+'</option>').join('')+'</select>'
+  +'<input type="date" value="'+from+'" onchange="window._ledgerFrom=this.value;route()"> ~ <input type="date" value="'+to+'" onchange="window._ledgerTo=this.value;route()"></div>';
+  if(!cid)return '<div class="card">'+sel+'거래처가 없습니다</div>';
+  const c=co(cid);
+  // 차변 = 매출 세금계산서(발행), 대변 = 입금 배분
+  const debits=DB.taxInvoices.filter(t=>t.type==='sales'&&t.status==='sent'&&t.companyId===cid).map(t=>({date:t.date,desc:'세금계산서 '+t.no+(t.modifyReason?' (수정:'+t.modifyReason+')':'')+' — '+basisPlain(t),dr:t.supply+t.vat,cr:0,ti:t}));
+  const credits=DB.allocs.filter(a=>{if(a.targetType!=='installment')return false;
+    const i=byId(DB.installments,a.targetId);if(!i)return false;
+    const o=byId(DB.orders,i.orderId);return o&&o.companyId===cid;}).map(a=>{
+    const b=byId(DB.bank,a.bankId);const i=byId(DB.installments,a.targetId);const o=byId(DB.orders,i.orderId);
+    return {date:a.date,desc:'입금 ('+esc(b?b.desc:'')+') → '+o.no+' '+i.seq+'회 '+i.name,dr:0,cr:a.amount};});
+  const all=debits.concat(credits).sort((a,b)=>a.date<b.date?-1:1);
+  const before=all.filter(r=>r.date<from);
+  const rows=all.filter(r=>r.date>=from&&r.date<=to);
+  let bal=before.reduce((s,r)=>s+r.dr-r.cr,0);
+  const openBal=bal;
+  let html='<div class="card">'+sel
+  +'<h3 style="margin-top:4px">'+esc(c.name)+' 원장 <span class="mini">(차변=계산서 발행 / 대변=입금 배분 / 잔액=받을 돈)</span></h3>'
+  +'<table><tr><th>일자</th><th>적요</th><th class="r">차변(매출)</th><th class="r">대변(입금)</th><th class="r">잔액</th></tr>'
+  +'<tr style="background:#f8fafc"><td>'+from+'</td><td><b>전기 이월</b></td><td></td><td></td><td class="r num"><b>'+fmt(openBal)+'</b></td></tr>'
+  +rows.map(r=>{bal+=r.dr-r.cr;
+    return '<tr><td>'+r.date+'</td><td>'+r.desc+'</td><td class="r num">'+(r.dr?fmt(r.dr):'')+'</td><td class="r num">'+(r.cr?fmt(r.cr):'')+'</td><td class="r num">'+fmt(bal)+'</td></tr>';}).join('')
+  +'<tr style="background:#f8fafc"><td colspan="2"><b>기말 잔액</b></td><td class="r num"><b>'+fmt(rows.reduce((s,r)=>s+r.dr,0))+'</b></td><td class="r num"><b>'+fmt(rows.reduce((s,r)=>s+r.cr,0))+'</b></td><td class="r num"><b style="color:var(--bad)">'+fmt(bal)+'</b></td></tr></table>'
+  +'<div class="mini" style="margin-top:6px">참고: 미수금 관리는 계산서 기준이 아니라 [자금/통장대사 &gt; 수금 현황]의 수금계획(회차) 기준이 정확합니다. 원장은 세무·대조용입니다.</div></div>';
+  return html;}
+function basisPlain(ti){
+  if(ti.basis==='order'){const o=byId(DB.orders,ti.basisId);return o?'수주 '+o.no:'';}
+  if(ti.basis==='trans'){const d=byId(DB.trans,ti.basisId);return d?'납품 '+d.no:'';}
+  if(ti.basis==='installment'){const i=byId(DB.installments,ti.basisId);if(!i)return '';
+    const o=byId(DB.orders,i.orderId);return (o?o.no:'')+' '+i.seq+'회 '+i.name;}
+  return '';}
+function repProfit(){
+  const rows=DB.orders.filter(o=>o.status!=='canceled').map(o=>{
+    const t=lineTotals(o.lines);
+    const pos=DB.pos.filter(p=>p.orderId===o.id);
+    const poAmt=pos.reduce((s,p)=>s+lineTotals(p.lines).supply,0);
+    const mat=orderMaterialCost(o.id);
+    const ins=orderInsts(o.id);
+    const paid=ins.reduce((s,i)=>s+instAlloc(i.id),0);
+    const plan=ins.reduce((s,i)=>s+i.amount,0);
+    return {o,sup:t.supply,poAmt,mat,profit:t.supply-mat,margin:t.supply?Math.round((t.supply-mat)/t.supply*100):0,paid,recv:plan-paid};});
+  return '<div class="card"><h3 style="margin-top:0">수주별 손익 <span class="mini">(원가 = 연결 발주의 입고 실적 자재비 · 노무비/경비 제외 — 제작 중에도 실시간 표시)</span></h3>'
+  +'<table><tr><th>수주</th><th>거래처</th><th>상태</th><th class="r">계약액(공급가)</th><th class="r">발주액</th><th class="r">자재비 실적</th><th class="r">이익</th><th class="r">이익률</th><th class="r">수금</th><th class="r">미수</th></tr>'
+  +rows.map(r=>'<tr><td><a class="lnk" href="#/orders/view/'+r.o.id+'">'+r.o.no+'</a></td><td>'+esc(co(r.o.companyId).name)+'</td><td>'+badge('order',r.o.status)+'</td><td class="r num">'+fmt(r.sup)+'</td><td class="r num">'+fmt(r.poAmt)+'</td><td class="r num">'+fmt(r.mat)+'</td><td class="r num"'+(r.profit<0?' style="color:var(--bad)"':'')+'><b>'+fmt(r.profit)+'</b></td>'
+  +'<td class="r"><span class="badge '+(r.margin<15?'b-red':r.margin<30?'b-amber':'b-green')+'">'+r.margin+'%</span></td><td class="r num">'+fmt(r.paid)+'</td><td class="r num"'+(r.recv>0?' style="color:var(--bad)"':'')+'>'+fmt(r.recv)+'</td></tr>').join('')
+  +'</table></div>';}
+function repPlan(){
+  const f=window._planF||'all';
+  const tm=thisMonth();const nm=addDays(tm+'-28',7).slice(0,7);
+  const list=DB.installments.filter(i=>{const o=byId(DB.orders,i.orderId);if(!o||o.status==='canceled')return false;
+    if(f==='month')return i.dueDate&&i.dueDate.startsWith(tm);
+    if(f==='next')return i.dueDate&&i.dueDate.startsWith(nm);
+    if(f==='overdue')return i.status!=='paid'&&i.dueDate&&i.dueDate<today();
+    return true;}).sort((a,b)=>(a.dueDate||'')<(b.dueDate||'')?-1:1);
+  const sum=s=>list.filter(x=>s?x.status===s:1).reduce((t,x)=>t+x.amount,0);
+  return '<div class="card"><div class="bar">'
+  +[['all','전체'],['month','이번달 ('+tm+')'],['next','다음달'],['overdue','연체']].map(x=>'<a class="lnk" style="'+(f===x[0]?'font-weight:bold':'')+'" onclick="window._planF=\''+x[0]+'\';route()">'+x[1]+'</a>').join(' · ')
+  +'<div class="sp"></div><span class="mini">표시분 합계 <b class="num">'+fmt(sum())+'원</b></span></div>'
+  +'<table><tr><th>예정일</th><th>수주</th><th>거래처</th><th>회차</th><th>시점</th><th class="r">금액</th><th class="r">입금</th><th>상태</th><th>계산서</th><th></th></tr>'
+  +list.map(i=>{const o=byId(DB.orders,i.orderId);const late=i.status!=='paid'&&i.dueDate&&i.dueDate<today();
+    return '<tr><td'+(late?' style="color:var(--bad);font-weight:bold"':'')+'>'+(i.dueDate||'')+'</td><td><a class="lnk" href="#/orders/view/'+o.id+'">'+o.no+'</a></td><td>'+esc(co(o.companyId).name)+'</td><td>'+i.seq+'회 '+esc(i.name)+'</td><td class="mini">'+esc(i.trigger||'')+'</td><td class="r num">'+fmt(i.amount)+'</td><td class="r num">'+fmt(instAlloc(i.id))+'</td><td>'+badge('inst',i.status)+'</td>'
+    +'<td class="mini">'+(i.tiId?((byId(DB.taxInvoices,i.tiId)||{}).no||''):'-')+'</td>'
+    +'<td>'+(i.status==='planned'?'<button class="sm" onclick="issueModal(\'installment\',\''+i.id+'\')">계산서 발행</button>':'')+'</td></tr>';}).join('')
+  +'</table><div class="mini" style="margin-top:6px">"이번달·다음달 들어올 돈"이 이 화면입니다. 연체 필터로 독촉 대상을 뽑을 수 있습니다.</div></div>';}
+function repHistory(){
+  const list=DB.trans.slice().sort((a,b)=>a.date<b.date?1:-1);
+  return '<div class="card"><h3 style="margin-top:0">매출·매입 이력 (거래명세서 기준)</h3>'
+  +'<table><tr><th>일자</th><th>구분</th><th>번호</th><th>거래처</th><th>연결</th><th class="r">공급가액</th><th class="r">부가세</th><th class="r">합계</th><th>계산서</th></tr>'
+  +list.map(d=>{const t=lineTotals(d.lines);
+    const link=d.type==='sales'?(d.orderId?'<a class="lnk" href="#/orders/view/'+d.orderId+'">'+((byId(DB.orders,d.orderId)||{}).no||'')+'</a>':''):((d.poId?'<a class="lnk" href="#/po/view/'+d.poId+'">'+((byId(DB.pos,d.poId)||{}).no||'')+'</a>':''));
+    return '<tr><td>'+d.date+'</td><td>'+(d.type==='sales'?'<span class="badge b-blue">매출</span>':'<span class="badge b-purple">매입</span>')+'</td><td><a class="lnk" onclick="dlView(\''+d.id+'\')">'+d.no+'</a></td><td>'+esc(co(d.companyId).name)+'</td><td>'+link+'</td><td class="r num">'+fmt(t.supply)+'</td><td class="r num">'+fmt(t.vat)+'</td><td class="r num"><b>'+fmt(t.total)+'</b></td><td>'+badge('trans',d.status)+'</td></tr>';}).join('')
+  +'</table></div>';}
+function repTis(){
+  const list=DB.taxInvoices.slice().sort((a,b)=>a.date<b.date?1:-1);
+  return '<div class="card"><h3 style="margin-top:0">세금계산서 통합 목록 (매출+매입)</h3>'
+  +'<table><tr><th>작성일</th><th>구분</th><th>번호</th><th>거래처</th><th>발행근거</th><th class="r">공급가액</th><th class="r">세액</th><th class="r">합계</th><th>상태</th></tr>'
+  +list.map(ti=>'<tr'+(ti.supply<0?' style="color:var(--bad)"':'')+'><td>'+ti.date+'</td><td>'+(ti.type==='sales'?'<span class="badge b-blue">매출</span>':'<span class="badge b-purple">매입</span>')+'</td><td>'+ti.no+(ti.originalId?' <span class="badge b-red">수정</span>':'')+'</td><td>'+esc(co(ti.companyId).name)+'</td><td>'+basisLink(ti)+'</td><td class="r num">'+fmt(ti.supply)+'</td><td class="r num">'+fmt(ti.vat)+'</td><td class="r num">'+fmt(ti.supply+ti.vat)+'</td><td>'+badge('ti',ti.status)+'</td></tr>').join('')
+  +'</table><div class="mini" style="margin-top:6px">부가세 신고 대사용: 매출/매입 합계를 홈택스 내역과 비교하세요. (추후 홈택스 자료비교 연동 자리)</div></div>';}
+function repPayable(){
+  const rows=DB.taxInvoices.filter(t=>t.type==='purchase'&&t.status==='sent').map(ti=>{
+    const paid=ptransAlloc(ti.basisId);
+    return {ti,paid,unpaid:ti.supply+ti.vat-paid};});
+  const tot=rows.reduce((s,r)=>s+r.unpaid,0);
+  return '<div class="card"><h3 style="margin-top:0">미지급 현황 (매입계산서 − 출금 배분)</h3>'
+  +'<table><tr><th>작성일</th><th>계산서</th><th>공급처</th><th>근거</th><th class="r">합계</th><th class="r">지급</th><th class="r">미지급</th></tr>'
+  +rows.map(r=>'<tr><td>'+r.ti.date+'</td><td>'+r.ti.no+'</td><td>'+esc(co(r.ti.companyId).name)+'</td><td>'+basisLink(r.ti)+'</td><td class="r num">'+fmt(r.ti.supply+r.ti.vat)+'</td><td class="r num">'+fmt(r.paid)+'</td><td class="r num"'+(r.unpaid>0?' style="color:var(--bad);font-weight:bold"':'')+'>'+fmt(r.unpaid)+'</td></tr>').join('')
+  +'<tr><td colspan="6" style="text-align:right"><b>미지급 합계</b></td><td class="r num"><b style="color:var(--bad)">'+fmt(tot)+'</b></td></tr></table>'
+  +'<div class="mini" style="margin-top:6px">지급(출금) 대사는 [자금/통장대사 &gt; 통장 내역]에서 출금 건에 [배분]으로 처리합니다.</div></div>';}
+
+window.addEventListener('DOMContentLoaded',()=>{loadDB();route();});
+</script>
+</body>
+</html>
+                                                                                                                                                            
