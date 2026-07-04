@@ -12,7 +12,7 @@ body{font-family:'Malgun Gothic','Apple SD Gothic Neo',sans-serif;background:var
 aside{width:200px;background:var(--nav);color:#cbd5e1;flex-shrink:0;position:sticky;top:0;height:100vh;overflow-y:auto}
 aside h1{font-size:15px;color:#fff;padding:16px 14px 10px;border-bottom:1px solid #1e293b}
 aside h1 small{display:block;font-size:10px;color:#64748b;font-weight:normal;margin-top:3px}
-aside a{display:block;padding:10px 16px;color:#cbd5e1;text-decoration:none;font-size:13px;border-left:3px solid transparent}
+aside a{display:block;padding:12px 16px;color:#cbd5e1;text-decoration:none;font-size:13px;border-left:3px solid transparent;min-height:40px}/* v4.4: 터치 40px */
 aside a:hover{background:#1e293b}
 aside a.on{background:#1e293b;color:#fff;border-left-color:var(--pri);font-weight:bold}
 aside .grp-h{padding:10px 16px 4px;font-size:11px;color:#64748b;cursor:pointer;display:flex;justify-content:space-between;align-items:center;letter-spacing:1px;user-select:none}
@@ -27,13 +27,13 @@ aside a.nav-pin.on{border-color:var(--pri);background:#1d2c4f;color:#fff}
 #topstrip{position:fixed;top:10px;right:14px;z-index:60}
 #topstrip a{display:inline-flex;align-items:center;gap:6px;background:var(--card);border:1px solid var(--line);border-radius:20px;padding:6px 12px;font-size:12px;color:var(--txt);cursor:pointer;box-shadow:0 1px 4px rgba(15,23,42,.12);text-decoration:none}
 #topstrip a:hover{border-color:var(--pri);color:var(--pri)}
-main{flex:1;padding:18px 22px;max-width:1200px}
+main{flex:1;padding:18px 22px;max-width:1320px}/* v4.4: 담당자 패널 공간 */
 h2{font-size:18px;margin-bottom:4px}
 h3{font-size:14px;margin:14px 0 8px}
 .crumb{font-size:12px;color:var(--sub);margin-bottom:12px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:14px;margin-bottom:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:14px}/* v4.4: 라운드 12px 통일 */
 .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px;margin-bottom:14px}
-.stat{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:12px;cursor:pointer}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;cursor:pointer}
 .stat:hover{border-color:var(--pri);box-shadow:0 1px 4px rgba(37,99,235,.15)}
 .stat .t{font-size:12px;color:var(--sub)}
 .stat .v{font-size:19px;font-weight:bold;margin-top:4px}
@@ -110,6 +110,33 @@ input:disabled,select:disabled{background:#f1f5f9;color:var(--sub)}
 .doc-t .r{text-align:right}.doc-t .c{text-align:center}
 .doc-foot{margin-top:14px;font-size:13px;text-align:right}
 @media print{body.printing>*{display:none!important}body.printing #printarea{display:block!important}}
+/* ---- v4.4 카드형 홈(SAP 포털 스타일) · 그룹 허브 · 업무 담당자 패널 · 브레드크럼 ---- */
+.kpis{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.kpis .stat{padding:9px 11px}
+.kpis .stat .v{font-size:15px;margin-top:2px}
+.kpis .stat .s{margin-top:1px}
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-bottom:14px}
+.tile{position:relative;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;min-height:118px;cursor:pointer;overflow:hidden;transition:box-shadow .15s,transform .15s}
+.tile:hover{box-shadow:0 6px 18px rgba(15,23,42,.14);transform:translateY(-2px);border-color:#cbd5e1}
+.tile .tt{font-size:13px;font-weight:bold;line-height:1.35;max-height:36px;overflow:hidden}
+.tile .ts{font-size:11px;color:var(--sub);margin-top:3px;max-height:30px;overflow:hidden}
+.tile .tc{font-size:11px;color:var(--pri);font-weight:bold;margin-top:4px}
+.tile .ic{position:absolute;right:10px;bottom:10px;width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:19px}
+.tile .tile-b{position:absolute;top:8px;right:10px;background:var(--bad);color:#fff;border-radius:10px;font-size:10px;padding:1px 6px;font-weight:bold}
+.dash-wrap{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:14px;align-items:start}
+@media(max-width:1100px){.dash-wrap{grid-template-columns:1fr}}
+.staff-h{font-size:13px;font-weight:bold;margin-bottom:8px}
+.staff-h::before{content:'\25CF';color:var(--bad);font-size:9px;margin-right:6px;vertical-align:2px}
+.staff-t td,.staff-t th{padding:5px 6px;font-size:12px}
+.staff-t .dep{background:#f8fafc;font-size:11px;color:var(--sub);font-weight:bold}
+.bc{font-size:12px;color:var(--sub);margin:0 0 8px}
+.bc a{color:var(--sub);text-decoration:none}
+.bc a:hover{color:var(--pri);text-decoration:underline}
+aside .grp-t{flex:1;cursor:pointer;padding:2px 0}
+aside .grp-t:hover{color:#e2e8f0}
+aside .grp-tg{padding:2px 7px;border-radius:6px;cursor:pointer}
+aside .grp-tg:hover{background:#1e293b;color:#e2e8f0}
+@media(max-width:820px){.tiles{grid-template-columns:repeat(2,1fr)}}
 /* ---- 모바일 대응 (추후 핸드폰 뷰) ---- */
 .card{overflow-x:auto}
 @media(max-width:820px){
@@ -2524,16 +2551,17 @@ function recentSaleFor(itemId,companyId){let best=null;
 
 /* ================= 라우터 ================= */
 /* v4: 히트판 업무축(견적/매입/판매/재고/회계)을 현대 UX 그룹 사이드바로 재배치 — 기존 라우트명 전부 유지 */
-const NAV_GROUPS=[
-  {id:'home',label:'홈',items:[['#/dash','🏠 대시보드']]},
-  {id:'sales',label:'영업',items:[['#/quotes','견적서'],['#/orders','수주 (프로젝트)'],['#/deliveries','납품 (거래명세서)'],['#/invoices','세금계산서 (매출)']]},
-  {id:'buy',label:'구매',items:[['#/rfqs','견적요청 (RFQ)'],['#/purchase','발주서'],['#/ptrans','입고 (매입명세)'],['#/pinvoices','세금계산서 (매입)']]},
-  {id:'stock',label:'재고',items:[['#/stock','자재 재고 / 불출'],['#/stockledger','상품수불대장'],['#/stockalert','적정재고 · 사장재고']]},
-  {id:'acct',label:'회계 (장부)',items:[['#/reports','장부 (통합 조회)'],['#/costpending','원가 미확정'],['#/reports/daily','일계표 / 월계표'],['#/reports/vat','부가세 신고자료'],['#/reports/notes','어음 관리대장'],['#/reports/billing','대금청구서'],['#/money/bank','자금 / 통장 대사']]},
-  {id:'hr',label:'인사',items:[['#/hr','사원 명부'],['#/leave','연차 (휴가) 관리']]}, // v4.3
-  {id:'collab',label:'협업',items:[['#/approvals','결재함'],['#/projects','PRJ 관리'],['#/calendar','일정 (달력)'],['#/vendor','공급사 포털 (시뮬)']]},
-  {id:'master',label:'기준정보',items:[['#/companies','거래처'],['#/items','품목'],['#/settings','설정 (본사)']]}];
+const NAV_GROUPS=[ // v4.4: [href,라벨,아이콘,한줄설명] — 라우트·라벨 불변, 아이콘·설명은 nav/허브 타일에서 사용
+  {id:'home',label:'홈',icon:'🏠',items:[['#/dash','대시보드','🏠','KPI · 작업 카드 · 업무 담당자']]},
+  {id:'sales',label:'영업',icon:'💼',items:[['#/quotes','견적서','📝','견적 작성 · 발송 · 수주 전환'],['#/orders','수주 (프로젝트)','📦','계약 · 공정 · 수금 계획'],['#/deliveries','납품 (거래명세서)','🚚','거래명세서 발행 · 출고'],['#/invoices','세금계산서 (매출)','🧾','매출 계산서 발행 · 전송']]},
+  {id:'buy',label:'구매',icon:'🛒',items:[['#/rfqs','견적요청 (RFQ)','📨','공급사 견적요청 · 회신 비교'],['#/purchase','발주서','📑','발주 작성 · 결재 · 발송'],['#/ptrans','입고 (매입명세)','📥','입고 처리 · 매입 명세'],['#/pinvoices','세금계산서 (매입)','🧾','매입 계산서 수취 대사']]},
+  {id:'stock',label:'재고',icon:'📦',items:[['#/stock','자재 재고 / 불출','🏗','현재고 · 불출 · 실사조정'],['#/stockledger','상품수불대장','📒','품목별 입출고 시간순 누계'],['#/stockalert','적정재고 · 사장재고','⚠️','발주 제안 · 처분 검토']]},
+  {id:'acct',label:'회계 (장부)',icon:'💰',items:[['#/reports','장부 (통합 조회)','📚','현금출납 · 원장 · 손익'],['#/costpending','원가 미확정','❗','명세서 원가 미입력 관리'],['#/reports/daily','일계표 / 월계표','📅','일 · 월 단위 집계'],['#/reports/vat','부가세 신고자료','🏛','과세기간 매출 · 매입 집계'],['#/reports/notes','어음 관리대장','💳','받을 · 지급어음 만기 관리'],['#/reports/billing','대금청구서','📮','월말 대금청구서 발행'],['#/money/bank','자금 / 통장 대사','🏦','입출금 대사 · 자금 현황']]},
+  {id:'hr',label:'인사',icon:'👥',items:[['#/hr','사원 명부','🪪','부서 · 직급 · 연락처 · 인사카드'],['#/leave','연차 (휴가) 관리','🌴','연차 산정 · 휴가 신청 · 결재']]}, // v4.3
+  {id:'collab',label:'협업',icon:'🤝',items:[['#/approvals','결재함','✅','승인 · 반려 · 결재 이력'],['#/projects','PRJ 관리','📊','프로젝트 총괄 · 수익률'],['#/calendar','일정 (달력)','📆','개인 · 프로젝트 · 전표 일정'],['#/vendor','공급사 포털 (시뮬)','🔗','공급사 회신 · 역발행 시뮬']]},
+  {id:'master',label:'기준정보',icon:'⚙️',items:[['#/companies','거래처','🏢','매출처 · 매입처 관리'],['#/items','품목','🔩','품목 · 단가 · 적정재고'],['#/settings','설정 (본사)','🛠','회사 정보 · 계정 · 연동']]}];
 function navActive(h){
+  if(h.startsWith('#/hub/')){const _g=h.split('/')[2];if(NAV_GROUPS.some(g=>g.id===_g))return {href:'#/hub/'+_g,gid:_g};} // v4.4: 그룹 허브 — 해당 그룹 자동 펼침
   if(h==='#/mail'||h.startsWith('#/mail/')||h.startsWith('#/mail?'))return {href:'#/mail',gid:'pin'}; // v4.1: 메일함 상단 고정
   let best=null,bs=0;
   NAV_GROUPS.forEach(g=>g.items.forEach(it=>{const href=it[0];let s=0;
@@ -2564,11 +2592,12 @@ function renderNav(){const h=location.hash||'#/dash';
   document.getElementById('nav').innerHTML=pin+NAV_GROUPS.map(g=>{
     const open=(g.id===act.gid)||DB.ui.navOpen[g.id]!==false; // 현재 페이지 그룹은 항상 펼침
     const gBadge=g.items.reduce((s,it)=>s+navBadge(it[0]),0);
-    return '<div class="grp'+(open?'':' closed')+'"><div class="grp-h" onclick="navToggle(\''+g.id+'\')"><span>'+g.label+'</span><span>'+(!open&&gBadge?'<span class="badge b-red">'+gBadge+'</span> ':'')+(open?'▾':'▸')+'</span></div>'
+    const hubHref=g.id==='home'?'#/dash':'#/hub/'+g.id; // v4.4: 제목 클릭=그룹 허브(카드형 홈), 화살표(▾/▸)만 접기/펼치기
+    return '<div class="grp'+(open?'':' closed')+'"><div class="grp-h"><span class="grp-t" title="'+g.label+' 허브 열기" onclick="location.hash=\''+hubHref+'\'">'+(g.icon?g.icon+' ':'')+g.label+'</span><span>'+(!open&&gBadge?'<span class="badge b-red">'+gBadge+'</span> ':'')+'<span class="grp-tg" title="접기/펼치기" onclick="navToggle(\''+g.id+'\')">'+(open?'▾':'▸')+'</span></span></div>'
     +'<div class="grp-items">'+g.items.map(it=>{
       const on=act.href===it[0]?' class="on"':'';
       const b=navBadge(it[0]);
-      return '<a href="'+it[0]+'"'+on+'>'+it[1]+(b?' <span class="badge b-red">'+b+'</span>':'')+'</a>';}).join('')+'</div></div>';}).join('');
+      return '<a href="'+it[0]+'"'+on+'>'+(it[2]?it[2]+' ':'')+it[1]+(b?' <span class="badge b-red">'+b+'</span>':'')+'</a>';}).join('')+'</div></div>';}).join('');
   const us=document.getElementById('user-sel');
   if(us)us.innerHTML=(DB.users||[]).map(u=>'<option value="'+u.id+'"'+(u.id===curUser().id?' selected':'')+'>'+esc(u.name)+' ['+roleName(u.role)+']</option>').join('');
   const ts=document.getElementById('ts-mail');
@@ -2603,9 +2632,11 @@ function route(){renderNav();const h=(location.hash||'#/dash').slice(2);const[p,
     case 'costpending':pageCostPending(M);break;
     case 'hr':pageHr(M);break; // v4.3: 사원 명부
     case 'leave':pageLeave(M);break; // v4.3: 연차(휴가) 관리
+    case 'hub':pageHub(M,sub);break; // v4.4: 그룹 허브 (카드형 홈)
     case 'reports':pageReports(M,sub||'ledger');break;
     default:pageDash(M);
   }}catch(e){M.innerHTML='<div class="card">오류: '+esc(e.message)+'</div>';console.error(e);}
+  try{if(M&&M.insertAdjacentHTML){const _bc=bcHtml(location.hash||'#/dash');if(_bc)M.insertAdjacentHTML('afterbegin',_bc);}}catch(e){} // v4.4: 브레드크럼 (그룹 › 페이지명, 그룹 클릭=허브)
   window.scrollTo(0,0);}
 window.addEventListener('hashchange',route);
 
@@ -2799,7 +2830,82 @@ function piFilter(q){document.getElementById('pi-list').innerHTML=piRows(piBase(
 function itemKind(k){return {product:'제품',material:'자재',part:'부품',service:'용역'}[k]||k;}
 
 /* ================= 1. 홈 (대시보드) ================= */
-function pageDash(M){
+/* ================= v4.4 카드형 홈 · 그룹 허브 · 업무 담당자 패널 (SAP 포털 스타일 벤치마킹) ================= */
+const HUB_BG={home:'#eff6ff',sales:'#dbeafe',buy:'#dcfce7',stock:'#fef3c7',acct:'#e0f2fe',hr:'#ccfbf1',collab:'#f3e8ff',master:'#f1f5f9'};
+function tileHtml(t){ // 공통 작업 타일 — 제목(최대 2줄)+한 줄 설명+우하단 원형 아이콘+대기 배지
+  const go=t.onclick||"location.hash='"+t.href+"'";
+  return '<div class="tile" onclick="'+go+'">'
+  +(t.badge?'<span class="tile-b">'+t.badge+'</span>':'')
+  +'<div class="tt">'+t.title+'</div>'
+  +(t.sub?'<div class="ts">'+t.sub+'</div>':'')
+  +(t.count?'<div class="tc">'+t.count+'</div>':'')
+  +'<div class="ic" style="background:'+(t.bg||'#eff6ff')+'">'+(t.icon||'▦')+'</div></div>';}
+function hubCount(href){ // 허브 타일 라이브 카운트 — 계산이 싼 것만 (대용량 v4_Test에서도 즉시)
+  try{switch(href){
+    case '#/quotes':{const n=DB.quotes.filter(q=>['draft','sent'].includes(q.status)).length;return n?n+'건 진행':'';}
+    case '#/orders':case '#/projects':{const n=DB.orders.filter(o=>['ordered','producing'].includes(o.status)).length;return n?n+'건 진행':'';}
+    case '#/deliveries':{const n=DB.trans.filter(t=>t.type==='sales'&&t.status==='open').length,h2=holdDls().length;return (n?n+'건 미발행':'')+(h2?(n?' · ':'')+'미입고 '+h2:'');}
+    case '#/purchase':{const n=DB.pos.filter(p=>p.status==='ordered').length;return n?n+'건 진행':'';}
+    case '#/ptrans':{const n=DB.pos.filter(p=>p.status==='ordered').length;return n?'입고 대기 '+n+'건':'';}
+    case '#/rfqs':{const n=(DB.rfqs||[]).length;return n?n+'건':'';}
+    case '#/invoices':{const n=DB.taxInvoices.filter(t=>t.type==='sales'&&t.date.startsWith(thisMonth())).length;return n?'이달 '+n+'건':'';}
+    case '#/pinvoices':{const n=DB.taxInvoices.filter(t=>t.type==='purchase'&&t.date.startsWith(thisMonth())).length;return n?'이달 '+n+'건':'';}
+    case '#/costpending':{const n=costPendingLines().length;return n?n+'건 미확정':'';}
+    case '#/reports/notes':{const n=notesDueSoon().length;return n?'D-7 '+n+'건':'';}
+    case '#/money/bank':{const n=DB.bank.filter(b=>{const s=bankStatus(b);return s==='unmatched'||s==='partial';}).length;return n?'미대사 '+n+'건':'';}
+    case '#/approvals':{const n=pendingApvList().length;return n?'대기 '+n+'건':'';}
+    case '#/leave':{const n=pendingLeaveCount();return n?'승인 대기 '+n+'건':'';}
+    case '#/companies':return fmt(DB.companies.length)+'곳';
+    case '#/items':return fmt(DB.items.length)+'품목';
+    case '#/hr':{const n=(DB.users||[]).filter(u=>u.active!==0&&hrOf(u.id).status==='재직').length;return '재직 '+n+'명';}
+  }}catch(e){}
+  return '';}
+function staffPanelHtml(deptKey){ // 업무 담당자 패널 — DB.hr 기반(재직만) 부서별 그룹 · 이름=인사카드 · ✉=쪽지 (하드코딩 없음)
+  DB.hr=DB.hr||{};
+  const users=(DB.users||[]).filter(u=>u.active!==0&&hrOf(u.id).status==='재직');
+  const by={};users.forEach(u=>{const d=hrOf(u.id).dept||'미지정';(by[d]=by[d]||[]).push(u);});
+  let depts=Object.keys(by).sort();
+  if(deptKey){const m=depts.filter(d=>d.includes(deptKey));if(m.length)depts=m;} // 부서명이 그룹명과 매칭되면 필터, 아니면 전체
+  if(!depts.length)return '<div class="staff-h">업무 담당자</div><div class="mini">재직 중 사원이 없습니다 — <a class="lnk" href="#/hr">사원 명부</a>에서 인사카드를 입력하세요</div>';
+  return '<div class="staff-h">업무 담당자</div>'
+  +'<table class="staff-t"><tr><th>업무 (직책/직급)</th><th>이름</th><th>연락처</th><th></th></tr>'
+  +depts.map(d=>'<tr><td colspan="4" class="dep">'+esc(d)+'</td></tr>'
+    +by[d].map(u=>{const h2=hrOf(u.id);
+      return '<tr><td class="mini">'+esc(h2.jikchak||h2.jikgub||'-')+'</td>'
+      +'<td><a class="lnk" onclick="hrCardModal(\''+u.id+'\')" title="인사카드 열기">'+esc(u.name)+'</a></td>'
+      +'<td class="mini num">'+esc(h2.tel||h2.hp||'-')+'</td>'
+      +'<td><a class="lnk" onclick="composeModal({toUserId:\''+u.id+'\'})" title="쪽지 보내기">✉</a></td></tr>';}).join('')).join('')
+  +'</table><div class="mini" style="margin-top:6px">이름 = 인사카드 · ✉ = 쪽지 · <a class="lnk" href="#/hr">사원 명부 →</a></div>';}
+function bcHtml(h){ // 브레드크럼: 그룹 › 페이지 (그룹 클릭 = 허브) — 모든 페이지 상단
+  if(h.startsWith('#/hub/')){const g=NAV_GROUPS.find(x=>x.id===h.split('/')[2]);return g?'<div class="bc"><a href="#/dash">🏠 홈</a> › <b>'+g.label+'</b></div>':'';}
+  const act=navActive(h);
+  if(act.gid==='pin')return '<div class="bc"><a href="#/dash">🏠 홈</a> › <b>✉ 메일함</b></div>';
+  const g=NAV_GROUPS.find(x=>x.id===act.gid);if(!g||g.id==='home')return '';
+  const it=g.items.find(x=>x[0]===act.href);if(!it)return '';
+  return '<div class="bc"><a href="#/hub/'+g.id+'">'+(g.icon?g.icon+' ':'')+g.label+'</a> › <b>'+esc(it[1])+'</b></div>';}
+function pageHub(M,gid){ // 그룹 허브 — 사이드바 그룹 제목 클릭 시 해당 그룹의 카드형 홈
+  const g=NAV_GROUPS.find(x=>x.id===gid);
+  if(!g||g.id==='home'){pageDash(M);return;}
+  M.innerHTML='<h2>'+(g.icon?g.icon+' ':'')+g.label+'</h2><div class="crumb">'+g.label+' 업무 카드 — 클릭하면 해당 화면으로 이동합니다</div>'
+  +'<div class="tiles">'+g.items.map(it=>tileHtml({href:it[0],title:esc(it[1]),sub:it[3]||'',icon:it[2]||'▦',bg:HUB_BG[g.id],badge:navBadge(it[0]),count:hubCount(it[0])})).join('')+'</div>'
+  +'<div class="card">'+staffPanelHtml(g.label.split(' ')[0])+'</div>';}
+function dashTiles(){ // 홈 작업 카드 12종 — 자주 하는 작업 직행 (작성 화면/목록)
+  const un=mailUnread(),pend=pendingApvList().length,hold=holdDls().length,cp=costPendingLines().length;
+  return [
+   {href:'#/deliveries/new',title:'거래명세서<br>작성',sub:'단발 판매 · 부품 판매',icon:'🧾',bg:'#dbeafe'},
+   {href:'#/quotes/edit/new',title:'견적서<br>작성',sub:'작성 → 발송 → 수주 전환',icon:'📝',bg:'#e0e7ff'},
+   {href:'#/orders/edit/new',title:'수주<br>등록',sub:'프로젝트(계약) 등록',icon:'📦',bg:'#fef3c7'},
+   {onclick:"window._poOrder=null;location.hash='#/po/edit/new'",title:'발주서<br>작성',sub:'자재 · 부품 발주',icon:'📑',bg:'#dcfce7'},
+   {href:'#/ptrans',title:'입고<br>처리',sub:'발주 입고 · 매입명세',icon:'📥',bg:'#ccfbf1',badge:hold},
+   {href:'#/invoices',title:'세금계산서<br>발행',sub:'매출 계산서 발행 · 전송',icon:'🏛',bg:'#fee2e2'},
+   {href:'#/mail',title:'메일함',sub:'내부 쪽지 · 문서 발송',icon:'✉️',bg:'#fce7f3',badge:un},
+   {href:'#/approvals',title:'결재함',sub:'승인 · 반려 처리',icon:'✅',bg:'#f3e8ff',badge:pend},
+   {href:'#/leave',title:'휴가<br>신청',sub:'연차 조회 · 결재 상신',icon:'🌴',bg:'#ccfbf1',badge:pendingLeaveCount()},
+   {href:'#/stock',title:'재고<br>현황',sub:'현재고 · 불출 · 실사',icon:'🏗',bg:'#fef9c3'},
+   {href:'#/reports',title:'장부',sub:'현금출납 · 원장 · 손익',icon:'📚',bg:'#e0f2fe',badge:cp},
+   {href:'#/projects',title:'PRJ<br>관리',sub:'프로젝트 총괄 · 수익률',icon:'📊',bg:'#ffedd5'}
+  ].map(tileHtml).join('');}
+function pageDash(M){ // v4.4: SAP 포털 스타일 홈 — ① KPI 칩(0건 자동 숨김) ② 작업 카드 그리드 ③ 업무 담당자 패널(우측, <1100px 하단)
   const recv=totalReceivable();
   const unmatched=DB.bank.filter(b=>bankStatus(b)==='unmatched'||bankStatus(b)==='partial').length;
   const producing=DB.orders.filter(o=>['ordered','producing'].includes(o.status));
@@ -2810,27 +2916,35 @@ function pageDash(M){
   const mSales=DB.taxInvoices.filter(t=>t.type==='sales'&&t.status==='sent'&&t.date.startsWith(tm)).reduce((s,t)=>s+t.supply+t.vat,0);
   const mBuy=DB.taxInvoices.filter(t=>t.type==='purchase'&&t.status==='sent'&&t.date.startsWith(tm)).reduce((s,t)=>s+t.supply+t.vat,0);
   const payable=DB.taxInvoices.filter(t=>t.type==='purchase'&&t.status==='sent').reduce((s,t)=>s+t.supply+t.vat-ptransAlloc(t.basisId),0);
-  M.innerHTML='<h2>홈</h2><div class="crumb">오늘 '+today()+' · 모든 숫자는 저장값이 아니라 실시간 계산값입니다. 카드를 클릭하면 해당 화면으로 이동합니다.</div>'
-  +'<div class="cards">'
-  +'<div class="stat" onclick="location.hash=\'#/money/status\'"><div class="t">총 미수금 (Σ수금계획 − Σ입금)</div><div class="v" style="color:var(--bad)">'+fmt(recv)+'</div><div class="s">원</div></div>'
-  +(function(){const dl=(DB.schedules||[]).filter(x=>x.deadline&&!x.done).sort((a,b)=>a.date<b.date?-1:1);const n=dl[0];return '<div class="stat" onclick="location.hash=\'#/calendar\'"><div class="t">데드라인 (달력)</div><div class="v"'+(n&&n.date<addDays(today(),8)?' style="color:var(--bad)"':'')+'>'+(n?dday(n.date):'—')+'</div><div class="s">'+(n?esc(n.title):'등록된 데드라인 없음')+'</div></div>';})()+'<div class="stat" onclick="location.hash=\'#/approvals\'"><div class="t">결재 대기</div><div class="v" style="color:var(--purple,#7e22ce)">'+pendingApvList().length+'건</div><div class="s">승인 전 다음 단계 잠김</div></div>'
-  +(function(){const ids=onLeaveToday();return ids.length?'<div class="stat" onclick="location.hash=\'#/leave\'"><div class="t">🌴 오늘 휴가</div><div class="v" style="color:#0d9488">'+ids.length+'명</div><div class="s">'+ids.map(x=>esc(userName(x))).join(', ')+'</div></div>':'';})() // v4.3: 있을 때만 표시
-  +'<div class="stat" onclick="location.hash=\'#/reports/plan\'"><div class="t">세금계산서 발행 대기</div><div class="v">'+dueInsts.length+'건</div><div class="s">7일 내 도래 미청구 회차</div></div>'
-  +'<div class="stat" onclick="location.hash=\'#/money/bank\'"><div class="t">통장 미대사</div><div class="v" style="color:var(--warn)">'+unmatched+'건</div><div class="s">배분 확인 필요</div></div>'
-  +'<div class="stat" onclick="location.hash=\'#/orders\'"><div class="t">제작중 수주</div><div class="v">'+producing.length+'건</div><div class="s">납기 7일 내 '+urgent.length+'건</div></div>'
-  +'<div class="stat" onclick="location.hash=\'#/deliveries\'"><div class="t">미발행 납품</div><div class="v">'+openDl.length+'건</div><div class="s">계산서 미발행 거래명세서</div></div>'
-  +(function(){const h=holdDls();return '<div class="stat" onclick="location.hash=\'#/deliveries\'"><div class="t">📦 미입고 대기 전표</div><div class="v"'+(h.length?' style="color:var(--warn)"':'')+'>'+h.length+'건</div><div class="s">입고 완료 시 [출고 전환]으로 전달</div></div>';})()
-  +(function(){const n=costPendingLines().length;return '<div class="stat" onclick="location.hash=\'#/costpending\'"><div class="t">원가 미확정</div><div class="v"'+(n?' style="color:var(--warn)"':'')+'>'+n+'건</div><div class="s">명세서 원가 미입력 — 수익률 왜곡 주의</div></div>';})() // v4.2
-  +'<div class="stat" onclick="location.hash=\'#/invoices\'"><div class="t">이달 매출 (계산서)</div><div class="v" style="color:var(--pri)">'+fmt(mSales)+'</div><div class="s">'+tm+'</div></div>'
-  +'<div class="stat" onclick="location.hash=\'#/pinvoices\'"><div class="t">이달 매입 (계산서)</div><div class="v">'+fmt(mBuy)+'</div><div class="s">'+tm+'</div></div>'
-  +'<div class="stat" onclick="location.hash=\'#/reports/payable\'"><div class="t">미지급금</div><div class="v">'+fmt(payable)+'</div><div class="s">매입계산서 − 출금배분</div></div>'
-  +(function(){const due=notesDueSoon();return '<div class="stat" onclick="location.hash=\'#/reports/notes\'"><div class="t">어음 만기 임박 (D-7)</div><div class="v"'+(due.length?' style="color:var(--bad)"':'')+'>'+due.length+'건</div><div class="s">'+(due.length?esc(co(due[0].companyId).name)+' '+fmt(due[0].amount)+'원 ('+due[0].maturity+')':'받을·지급어음 관리대장')+'</div></div>';})()
+  const hold=holdDls().length,cp=costPendingLines().length,pend=pendingApvList().length,due=notesDueSoon(),lv=onLeaveToday();
+  const dl=(DB.schedules||[]).filter(x=>x.deadline&&!x.done).sort((a,b)=>a.date<b.date?-1:1)[0];
+  const K=(show,href,t,v,s,vs)=>show?'<div class="stat" onclick="location.hash=\''+href+'\'"><div class="t">'+t+'</div><div class="v"'+(vs?' style="'+vs+'"':'')+'>'+v+'</div><div class="s">'+s+'</div></div>':'';
+  M.innerHTML='<h2>홈</h2><div class="crumb">오늘 '+today()+' · 모든 숫자는 실시간 계산값 · 0건 지표는 자동으로 숨겨집니다 · 카드 클릭 = 해당 화면 이동</div>'
+  +'<div class="cards kpis">' // v4.4: KPI 칩 — 미수금·이달매출은 항상, 나머지는 0건이면 숨김
+  +K(true,'#/money/status','총 미수금',fmt(recv),'Σ수금계획 − Σ입금','color:var(--bad)')
+  +K(true,'#/invoices','이달 매출 (계산서)',fmt(mSales),tm,'color:var(--pri)')
+  +K(!!dl,'#/calendar','데드라인 (달력)',dl?dday(dl.date):'—',dl?esc(dl.title):'',dl&&dl.date<addDays(today(),8)?'color:var(--bad)':'')
+  +K(pend>0,'#/approvals','결재 대기',pend+'건','승인 전 다음 단계 잠김','color:#7e22ce')
+  +K(lv.length>0,'#/leave','🌴 오늘 휴가',lv.length+'명',lv.map(x=>esc(userName(x))).join(', '),'color:#0d9488')
+  +K(dueInsts.length>0,'#/reports/plan','세금계산서 발행 대기',dueInsts.length+'건','7일 내 도래 미청구 회차','')
+  +K(unmatched>0,'#/money/bank','통장 미대사',unmatched+'건','배분 확인 필요','color:var(--warn)')
+  +K(producing.length>0,'#/orders','제작중 수주',producing.length+'건','납기 7일 내 '+urgent.length+'건','')
+  +K(openDl.length>0,'#/deliveries','미발행 납품',openDl.length+'건','계산서 미발행 거래명세서','')
+  +K(hold>0,'#/deliveries','📦 미입고 대기 전표',hold+'건','입고 완료 시 [출고 전환]으로 전달','color:var(--warn)')
+  +K(cp>0,'#/costpending','원가 미확정',cp+'건','명세서 원가 미입력 — 수익률 왜곡 주의','color:var(--warn)')
+  +K(mBuy>0,'#/pinvoices','이달 매입 (계산서)',fmt(mBuy),tm,'')
+  +K(payable>0,'#/reports/payable','미지급금',fmt(payable),'매입계산서 − 출금배분','')
+  +K(due.length>0,'#/reports/notes','어음 만기 임박 (D-7)',due.length+'건',due.length?esc(co(due[0].companyId).name)+' '+fmt(due[0].amount)+'원 ('+due[0].maturity+')':'','color:var(--bad)')
   +'</div>'
+  +'<div class="dash-wrap"><div>'
+  +'<h3 style="margin:0 0 8px">⚡ 자주 하는 작업</h3><div class="tiles">'+dashTiles()+'</div>'
   +'<div class="grid2">'
   +'<div class="card"><h3 style="margin-top:0">납기 임박 / 제작중 수주</h3><table><tr><th>수주번호</th><th>거래처</th><th>납기</th><th class="r">계약액</th><th>완성율</th><th>상태</th></tr>'
   +(producing.map(o=>'<tr><td><a class="lnk" href="#/orders/view/'+o.id+'">'+o.no+'</a></td><td>'+esc(co(o.companyId).name)+'</td><td'+(o.dueDate<=addDays(today(),7)?' style="color:var(--bad);font-weight:bold"':'')+'>'+(o.dueDate||'')+'</td><td class="r num">'+fmt(orderTotal(o))+'</td><td>'+miniBar(orderRates(o.id).comp)+'</td><td>'+badge('order',o.status)+'</td></tr>').join('')||'<tr><td colspan="6" class="mini">없음</td></tr>')+'</table></div>'
   +'<div class="card"><h3 style="margin-top:0">수금 예정 (60일 내 도래 회차)</h3><table><tr><th>수주</th><th>회차</th><th>예정일</th><th class="r">금액</th><th class="r">입금</th><th>상태</th></tr>'
   +dashInstRows()+'</table></div>'
+  +'</div></div>'
+  +'<div class="card" style="margin-bottom:0">'+staffPanelHtml()+'</div>' // v4.4: 업무 담당자 패널 (데스크톱 우측 고정 열)
   +'</div>';}
 function dashInstRows(){
   const till=addDays(today(),62);
